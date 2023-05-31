@@ -35,6 +35,7 @@ class UserRatingUpdateDTO {
         'fromUserType': fromUserType,
         'toUserId': toUserId,
         'toUserType': toUserType,
+        'orderId': orderId,
         'rating': rating,
       };
 }

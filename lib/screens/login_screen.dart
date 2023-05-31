@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,6 +56,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         setState(() {
           _isLoginFailed = false;
         });
+
         if (context.mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
