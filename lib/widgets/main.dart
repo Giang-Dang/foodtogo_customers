@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/screens/splash_screen.dart';
-import 'package:foodtogo_customers/screens/tabs_screen.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/util/material_color_creator.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +13,7 @@ final kColorScheme = ColorScheme.fromSwatch(
 
 final kTheme = ThemeData(
   textTheme: GoogleFonts.bitterTextTheme(),
+  scaffoldBackgroundColor: KColors.kOnBackgroundColor,
 ).copyWith(
   useMaterial3: true,
   colorScheme: kColorScheme,
@@ -33,7 +34,7 @@ final kTheme = ThemeData(
 );
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -45,8 +46,8 @@ class MyApp extends StatelessWidget {
       title: 'FoodToGo - Customers',
       theme: kTheme,
       home: const Scaffold(
-        // body: SplashScreen(),
-        body: TabsScreen(),
+        // body: UserRegisterScreen(),
+        body: SplashScreen(),
       ),
     );
   }
