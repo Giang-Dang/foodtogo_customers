@@ -1,6 +1,8 @@
+import 'package:foodtogo_customers/models/merchant.dart';
+
 class Promotion {
   final int id;
-  final int discountCreatorMerchantId;
+  final Merchant discountCreatorMerchant;
   final String name;
   final String description;
   final int discountPercentage;
@@ -12,7 +14,7 @@ class Promotion {
 
   const Promotion({
     required this.id,
-    required this.discountCreatorMerchantId,
+    required this.discountCreatorMerchant,
     required this.name,
     this.description = '',
     required this.discountPercentage,
@@ -23,18 +25,18 @@ class Promotion {
     required this.quantityLeft,
   });
 
-  factory Promotion.fromJson(Map<String, dynamic> json) {
-    return Promotion(
-      id: json['id'],
-      discountCreatorMerchantId: json['discountCreatorMerchantId'],
-      name: json['name'],
-      description: json['description'],
-      discountPercentage: json['discountPercentage'],
-      discountAmount: json['discountAmount'].toDouble(),
-      startDate: DateTime.parse(json['startDate']),
-      endDate: DateTime.parse(json['endDate']),
-      quantity: json['quantity'],
-      quantityLeft: json['quantityLeft'],
-    );
-  }
+  // factory Promotion.fromJson(Map<String, dynamic> json) {
+  //   return Promotion(
+  //     id: json['id'],
+  //     discountCreatorMerchant: json['discountCreatorMerchantId'],
+  //     name: json['name'],
+  //     description: json['description'],
+  //     discountPercentage: json['discountPercentage'],
+  //     discountAmount: json['discountAmount'].toDouble(),
+  //     startDate: DateTime.parse(json['startDate']),
+  //     endDate: DateTime.parse(json['endDate']),
+  //     quantity: json['quantity'],
+  //     quantityLeft: json['quantityLeft'],
+  //   );
+  // }
 }

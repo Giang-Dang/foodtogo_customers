@@ -6,6 +6,7 @@ import 'package:foodtogo_customers/models/dto/create_dto/promotion_create_dto.da
 import 'package:foodtogo_customers/models/dto/promotion_dto.dart';
 import 'package:foodtogo_customers/models/dto/update_dto/promotion_update_dto.dart';
 import 'package:foodtogo_customers/models/promotion.dart';
+import 'package:foodtogo_customers/services/merchant_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/secrets.dart';
 import 'package:http/http.dart' as http;
@@ -13,8 +14,20 @@ import 'package:http/http.dart' as http;
 class PromotionServices {
   static const _apiUrl = 'api/PromotionAPI';
 
-  Future<List<Promotion>?> getAll(int discountCreatorMerchantId) async {
-    final promotionDTOsList = await getAllDTO(discountCreatorMerchantId);
+  Future<List<Promotion>?> getAll({
+    int? searchMerchantId,
+    DateTime? checkingDate,
+    int? pageSize,
+    int? pageNumber,
+  }) async {
+    final merchantServices = MerchantServices();
+
+    final promotionDTOsList = await getAllDTOs(
+      searchMerchantId: searchMerchantId,
+      checkingDate: checkingDate,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+    );
 
     if (promotionDTOsList == null) {
       return null;
@@ -23,9 +36,17 @@ class PromotionServices {
     List<Promotion> promotionsList = [];
 
     for (var promotionDTO in promotionDTOsList) {
+      var merchant =
+          await merchantServices.get(promotionDTO.discountCreatorMerchantId);
+
+      if (merchant == null) {
+        log('getAllbyMerchantId() merchant == null');
+        return null;
+      }
+
       Promotion promotion = Promotion(
           id: promotionDTO.id,
-          discountCreatorMerchantId: promotionDTO.discountCreatorMerchantId,
+          discountCreatorMerchant: merchant,
           name: promotionDTO.name,
           description: promotionDTO.description,
           discountPercentage: promotionDTO.discountPercentage,
@@ -40,7 +61,89 @@ class PromotionServices {
     return promotionsList;
   }
 
-  Future<List<PromotionDTO>?> getAllDTO(int discountCreatorMerchantId) async {
+  Future<List<PromotionDTO>?> getAllDTOs({
+    int? searchMerchantId,
+    DateTime? checkingDate,
+    int? pageSize,
+    int? pageNumber,
+  }) async {
+    final jwtToken = UserServices.jwtToken;
+
+    final queryParams = <String, String>{};
+    if (searchMerchantId != null) {
+      queryParams['searchMerchantId'] = searchMerchantId.toString();
+    }
+    if (checkingDate != null) {
+      queryParams['checkingDate'] = checkingDate.toIso8601String();
+    }
+    if (pageSize != null && pageNumber != null) {
+      queryParams['pageSize'] = pageSize.toString();
+      queryParams['pageNumber'] = pageNumber.toString();
+    }
+
+    final url = Uri.http(Secrets.kFoodToGoAPILink, _apiUrl, queryParams);
+
+    final responseJson = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $jwtToken',
+      },
+    );
+
+    if (responseJson.statusCode == HttpStatus.ok) {
+      final responseData = json.decode(responseJson.body);
+
+      final promotionDTOsList = (responseData['result'] as List)
+          .map((json) => PromotionDTO.fromJson(json))
+          .toList();
+
+      return promotionDTOsList;
+    }
+
+    return null;
+  }
+
+  Future<List<Promotion>?> getAllbyMerchantId(
+      int discountCreatorMerchantId) async {
+    final merchantServices = MerchantServices();
+
+    final promotionDTOsList =
+        await getAllDTObyMerchantId(discountCreatorMerchantId);
+
+    if (promotionDTOsList == null) {
+      return null;
+    }
+
+    List<Promotion> promotionsList = [];
+
+    for (var promotionDTO in promotionDTOsList) {
+      var merchant =
+          await merchantServices.get(promotionDTO.discountCreatorMerchantId);
+
+      if (merchant == null) {
+        log('getAllbyMerchantId() merchant == null');
+        return null;
+      }
+
+      Promotion promotion = Promotion(
+          id: promotionDTO.id,
+          discountCreatorMerchant: merchant,
+          name: promotionDTO.name,
+          description: promotionDTO.description,
+          discountPercentage: promotionDTO.discountPercentage,
+          discountAmount: promotionDTO.discountAmount,
+          startDate: promotionDTO.startDate,
+          endDate: promotionDTO.endDate,
+          quantity: promotionDTO.quantity,
+          quantityLeft: promotionDTO.quantityLeft);
+      promotionsList.add(promotion);
+    }
+
+    return promotionsList;
+  }
+
+  Future<List<PromotionDTO>?> getAllDTObyMerchantId(
+      int discountCreatorMerchantId) async {
     final jwtToken = UserServices.jwtToken;
     final url = Uri.http(Secrets.kFoodToGoAPILink, _apiUrl, {
       'searchMerchantId': discountCreatorMerchantId.toString(),
@@ -67,15 +170,25 @@ class PromotionServices {
   }
 
   Future<Promotion?> get(int promotionId) async {
+    final merchantServices = MerchantServices();
+
     final promotionDTO = await getDTO(promotionId);
 
     if (promotionDTO == null) {
       return null;
     }
 
+    var merchant =
+        await merchantServices.get(promotionDTO.discountCreatorMerchantId);
+
+    if (merchant == null) {
+      log('getAllbyMerchantId() merchant == null');
+      return null;
+    }
+
     final promotion = Promotion(
       id: promotionId,
-      discountCreatorMerchantId: promotionDTO.discountCreatorMerchantId,
+      discountCreatorMerchant: merchant,
       name: promotionDTO.name,
       discountPercentage: promotionDTO.discountPercentage,
       discountAmount: promotionDTO.discountAmount,

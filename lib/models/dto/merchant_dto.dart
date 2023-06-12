@@ -8,6 +8,7 @@ class MerchantDTO {
     required this.geoLatitude,
     required this.geoLongitude,
     required this.isDeleted,
+    required this.rating,
   });
   final int merchantId;
   final int userId;
@@ -17,6 +18,7 @@ class MerchantDTO {
   final double geoLatitude;
   final double geoLongitude;
   final bool isDeleted;
+  final double rating;
 
   factory MerchantDTO.fromJson(Map<String, dynamic> json) {
     return MerchantDTO(
@@ -28,6 +30,7 @@ class MerchantDTO {
       geoLatitude: json['geoLatitude'],
       geoLongitude: json['geoLongitude'],
       isDeleted: json['isDeleted'],
+      rating: json['rating'],
     );
   }
 }

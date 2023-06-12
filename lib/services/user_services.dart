@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodtogo_customers/models/dto/api_response_dto.dart';
@@ -9,7 +10,9 @@ import 'package:foodtogo_customers/models/dto/login_response_dto.dart';
 import 'package:foodtogo_customers/models/dto/register_request_dto.dart';
 import 'package:foodtogo_customers/models/dto/update_dto/user_update_dto.dart';
 import 'package:foodtogo_customers/models/dto/user_dto.dart';
+import 'package:foodtogo_customers/services/location_services.dart';
 import 'package:foodtogo_customers/settings/secrets.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspaths;
@@ -21,6 +24,8 @@ class UserServices {
   static bool isAuthorized = false;
   static String jwtToken = "";
   static String strUserId = "";
+  static double currentLongitude = 0.0;
+  static double currentLatitude = 0.0;
 
   Future<UserDTO?> get(int userId) async {
     const apiUrl = 'api/UserAPI';
@@ -248,5 +253,23 @@ class UserServices {
     } else {
       return false;
     }
+  }
+
+  Future<void> getUserLocation() async {
+    final locationServices = LocationServices();
+
+    double locationAccuracy = 200.0;
+    Position locationData = await locationServices.determinePosition();
+
+    int attempts = 0;
+    while (locationAccuracy > 50.0 && attempts < 10) {
+      locationData = await locationServices.determinePosition();
+      log(locationData.accuracy.toString());
+      locationAccuracy = math.min(locationAccuracy, locationData.accuracy);
+      attempts++;
+    }
+
+    currentLatitude = locationData.latitude;
+    currentLongitude = locationData.longitude;
   }
 }

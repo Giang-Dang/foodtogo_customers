@@ -1,4 +1,4 @@
-class CustomerDTO {
+class CustomerUpdateDTO {
   final int customerId;
   final String firstName;
   final String lastName;
@@ -6,7 +6,7 @@ class CustomerDTO {
   final String address;
   final double rating;
 
-  const CustomerDTO({
+  const CustomerUpdateDTO({
     required this.customerId,
     required this.firstName,
     required this.lastName,
@@ -15,8 +15,8 @@ class CustomerDTO {
     required this.rating,
   });
 
-  factory CustomerDTO.fromJson(Map<String, dynamic> json) {
-    return CustomerDTO(
+  factory CustomerUpdateDTO.fromJson(Map<String, dynamic> json) {
+    return CustomerUpdateDTO(
       customerId: json['customerId'],
       firstName: json['firstName'],
       lastName: json['lastName'],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
+import 'package:foodtogo_customers/widgets/home_widget.dart';
 
 enum TabName { home, orders, favorites, me }
 
@@ -15,14 +16,14 @@ class TabsScreen extends ConsumerStatefulWidget {
 
 class _TabsScreenState extends ConsumerState<TabsScreen> {
   int _selectedPageIndex = 0;
-  Widget _activePage = const Text('Home screen');
+  Widget _activePage = const HomeWidget();
 
   void _selectPage(int index) async {
     if (mounted) {
       setState(() {
         _selectedPageIndex = index;
         if (_selectedPageIndex == TabName.home.index) {
-          _activePage = const Text('Home screen');
+          _activePage = const HomeWidget();
         } else if (_selectedPageIndex == TabName.orders.index) {
           _activePage = const Text('Orders screen');
         } else if (_selectedPageIndex == TabName.favorites.index) {
@@ -30,7 +31,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
         } else if (_selectedPageIndex == TabName.me.index) {
           _activePage = const Text('Me screen');
         } else {
-          _activePage = const Text('Home screen');
+          _activePage = const HomeWidget();
         }
       });
     }

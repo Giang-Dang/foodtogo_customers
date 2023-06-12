@@ -8,6 +8,7 @@ class MenuItem {
     required this.unitPrice,
     required this.isClosed,
     required this.imagePath,
+    required this.rating,
   });
   final int id;
   final int merchantId;
@@ -17,6 +18,7 @@ class MenuItem {
   final double unitPrice;
   final bool isClosed;
   final String imagePath;
+  final double rating;
 
   factory MenuItem.fromJson(Map<String, dynamic> json) {
     return MenuItem(
@@ -28,6 +30,7 @@ class MenuItem {
       unitPrice: json['unitPrice'],
       isClosed: json['isClosed'],
       imagePath: json['imagePath'],
+      rating: json['rating'],
     );
   }
 }

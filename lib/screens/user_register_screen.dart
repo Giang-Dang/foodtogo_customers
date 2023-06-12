@@ -5,7 +5,6 @@ import 'package:foodtogo_customers/screens/login_screen.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 
-
 class UserRegisterScreen extends StatefulWidget {
   const UserRegisterScreen({super.key});
 
@@ -27,8 +26,15 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
   late bool _isPasswordObscured;
   late bool _isReEnterPasswordObscured;
 
+  bool _isRegistering = false;
+
   _onRegisterPressed() async {
     if (_formKey.currentState!.validate()) {
+      if (mounted) {
+        setState(() {
+          _isRegistering = true;
+        });
+      }
       final requestDTO = RegisterRequestDTO(
         username: _usernameController.text,
         password: _passwordController.text,
@@ -38,10 +44,16 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
 
       final apiResponse = await _userServices.register(requestDTO);
 
+      if (mounted) {
+        setState(() {
+          _isRegistering = false;
+        });
+      }
+
       if (!apiResponse.isSuccess) {
         _showAlertDialog(
           'Sorry',
-          'Unable to create your merchant at the moment. Please try again at a later time.',
+          'Unable to create your account at the moment. Please try again at a later time.',
           () {
             Navigator.of(context).pop();
           },
@@ -50,7 +62,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
 
       _showAlertDialog(
         'Success',
-        'We have successfully created your merchant.',
+        'We have successfully created your account.',
         () {
           Navigator.pop(context);
           Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -102,7 +114,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('FoodToGo - Merchants'),
+        title: const Text('FoodToGo - Customer'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(35, 15, 40, 30),
@@ -293,7 +305,9 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
                 onPressed: () {
                   _onRegisterPressed();
                 },
-                child: const Text('Register'),
+                child: _isRegistering
+                    ? const CircularProgressIndicator()
+                    : const Text('Register'),
               ),
               const SizedBox(height: 15),
               RichText(

@@ -7,6 +7,7 @@ class MenuItemUpdateDTO {
     required this.description,
     required this.unitPrice,
     this.isClosed = false,
+    required this.rating,
   });
   final int id;
   final int merchantId;
@@ -15,4 +16,5 @@ class MenuItemUpdateDTO {
   final String description;
   final double unitPrice;
   final bool isClosed;
+  final double rating;
 }

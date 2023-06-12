@@ -52,7 +52,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         setState(() {
           _isLoginFailed = true;
         });
-      } else {
+      } else { 
+        //login failed
         setState(() {
           _isLoginFailed = false;
         });
@@ -60,7 +61,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (context.mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => TabsScreen(),
+              builder: (context) => const TabsScreen(),
             ),
           );
         }

@@ -8,6 +8,7 @@ class MerchantUpdateDTO {
     required this.geoLatitude,
     required this.geoLongitude,
     required this.isDeleted,
+    required this.rating,
   });
   final int merchantId;
   final int userId;
@@ -17,4 +18,5 @@ class MerchantUpdateDTO {
   final double geoLatitude;
   final double geoLongitude;
   final bool isDeleted;
+  final double rating;
 }

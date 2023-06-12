@@ -3,9 +3,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:foodtogo_customers/models/promotion.dart';
 import 'package:foodtogo_customers/screens/login_screen.dart';
-import 'package:foodtogo_customers/services/promotion_services.dart';
+import 'package:foodtogo_customers/screens/tabs_screen.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 
@@ -26,13 +25,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   _login() async {
     //delay for animation
-    await _delay(1);
+    await _delay(100);
     //loading data
     final userServices = UserServices();
 
+    await userServices.getUserLocation();
+
     await userServices.checkLocalLoginAuthorized();
     if (UserServices.isAuthorized) {
-      //TODO: implement....
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const TabsScreen(),
+          ),
+        );
+      }
     } else {
       if (context.mounted) {
         Navigator.pushReplacement(
@@ -43,11 +51,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         );
       }
     }
-
   }
 
-  _delay(int seconds) async {
-    await Future.delayed(Duration(seconds: seconds));
+  _delay(int milliseconds) async {
+    await Future.delayed(Duration(milliseconds: milliseconds));
   }
 
   @override
@@ -96,9 +103,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     fontSize: 35,
                   ),
             ),
-            const SizedBox(height: 80),
+            const SizedBox(height: 10),
+            Text(
+              'We are getting your location. Please wait.',
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    color: KColors.kPrimaryColor,
+                    fontSize: 18,
+                  ),
+            ),
+            const SizedBox(height: 40),
             Image.asset(
-              'assets/images/pizza_loading.gif',
+              'assets/images/getting_location.gif',
               height: 80,
               width: 80,
             ),
@@ -152,7 +167,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 }
               },
             ),
-            const SizedBox(height: 60)
+            const SizedBox(height: 90)
           ],
         ),
       ),

@@ -45,8 +45,8 @@ class MyApp extends StatelessWidget {
       title: 'FoodToGo - Customers',
       theme: kTheme,
       home: const Scaffold(
-        // body: SplashScreen(),
-        body: TabsScreen(),
+        body: SplashScreen(),
+        // body: TabsScreen(),
       ),
     );
   }
