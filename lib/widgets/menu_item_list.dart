@@ -10,44 +10,21 @@ class MenuItemList extends StatefulWidget {
   }) : super(key: key);
 
   final List<MenuItem> menuItemList;
-
   @override
   State<MenuItemList> createState() => _MenuItemListState();
 }
 
 class _MenuItemListState extends State<MenuItemList> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    double deviceWidth = MediaQuery.of(context).size.width;
-    const double containerHeight = 240;
-
     final menuItemList = widget.menuItemList;
 
     return Container(
-      height: containerHeight,
-      width: deviceWidth,
       color: KColors.kBackgroundColor,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: SizedBox(
-          width: deviceWidth,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              const SizedBox(width: 15),
-              for (var menuItem in menuItemList)
-                MenuItemListItem(
-                  menuItem: menuItem,
-                  maxHeight: containerHeight,
-                ),
-              const SizedBox(width: 15),
-            ],
-          ),
+      child: ListView.builder(
+        itemCount: menuItemList.length,
+        itemBuilder: (context, index) => MenuItemListItem(
+          menuItem: menuItemList[index],
         ),
       ),
     );

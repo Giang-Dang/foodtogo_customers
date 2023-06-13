@@ -114,7 +114,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('FoodToGo - Customer'),
+        title: const Text('FoodToGo - Customers'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(35, 15, 40, 30),

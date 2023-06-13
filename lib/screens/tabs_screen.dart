@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
+import 'package:foodtogo_customers/widgets/favorite_widget.dart';
 import 'package:foodtogo_customers/widgets/home_widget.dart';
 
 enum TabName { home, orders, favorites, me }
@@ -17,6 +18,7 @@ class TabsScreen extends ConsumerStatefulWidget {
 class _TabsScreenState extends ConsumerState<TabsScreen> {
   int _selectedPageIndex = 0;
   Widget _activePage = const HomeWidget();
+  bool _isAppBarShow = false;
 
   void _selectPage(int index) async {
     if (mounted) {
@@ -24,14 +26,19 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
         _selectedPageIndex = index;
         if (_selectedPageIndex == TabName.home.index) {
           _activePage = const HomeWidget();
+          _isAppBarShow = false;
         } else if (_selectedPageIndex == TabName.orders.index) {
           _activePage = const Text('Orders screen');
+          _isAppBarShow = true;
         } else if (_selectedPageIndex == TabName.favorites.index) {
-          _activePage = const Text('Favorites screen');
+          _activePage = const FavoriteWidget();
+          _isAppBarShow = false;
         } else if (_selectedPageIndex == TabName.me.index) {
           _activePage = const Text('Me screen');
+          _isAppBarShow = false;
         } else {
           _activePage = const HomeWidget();
+          _isAppBarShow = false;
         }
       });
     }
@@ -41,20 +48,19 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    AppBar? appBar = AppBar(
-      backgroundColor: KColors.kBackgroundColor,
-      title: Text(
-        'FoodToGo - Customer',
-        style: Theme.of(context).textTheme.titleLarge!.copyWith(
-              color: KColors.kPrimaryColor,
-              fontSize: 24,
+    AppBar? appBar = !_isAppBarShow
+        ? null
+        : AppBar(
+            backgroundColor: KColors.kBackgroundColor,
+            title: Text(
+              'FoodToGo - Customer',
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    color: KColors.kPrimaryColor,
+                    fontSize: 24,
+                  ),
             ),
-      ),
-    );
+          );
 
-    if (_selectedPageIndex == TabName.me.index) {
-      appBar = null;
-    }
     return Scaffold(
       appBar: appBar,
       body: _activePage,

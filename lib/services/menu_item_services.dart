@@ -21,8 +21,10 @@ class MenuItemServices {
 
   Future<List<MenuItem>?> getAll({
     int? searchMerchantId,
+    String? searchName,
     int? searchItemTypeId,
     double? minRating,
+    bool? isClosed,
     int? pageSize,
     int? pageNumber,
   }) async {
@@ -31,8 +33,10 @@ class MenuItemServices {
 
     final dtoList = await getAllDTOs(
       searchMerchantId: searchMerchantId,
+      searchName: searchName,
       searchItemTypeId: searchItemTypeId,
       minRating: minRating,
+      isClosed: isClosed,
       pageSize: pageSize,
       pageNumber: pageNumber,
     );
@@ -73,8 +77,10 @@ class MenuItemServices {
 
   Future<List<MenuItemDTO>?> getAllDTOs({
     int? searchMerchantId,
+    String? searchName,
     int? searchItemTypeId,
     double? minRating,
+    bool? isClosed,
     int? pageSize,
     int? pageNumber,
   }) async {
@@ -84,11 +90,17 @@ class MenuItemServices {
     if (searchMerchantId != null) {
       queryParams['searchMerchantId'] = searchMerchantId.toString();
     }
+    if (searchName != null) {
+      queryParams['searchName'] = searchName;
+    }
     if (searchItemTypeId != null) {
       queryParams['searchItemTypeId'] = searchItemTypeId.toString();
     }
     if (minRating != null) {
       queryParams['minRating'] = minRating.toString();
+    }
+    if (isClosed != null) {
+      queryParams['isClosed'] = isClosed.toString();
     }
     if (pageSize != null && pageNumber != null) {
       queryParams['pageSize'] = pageSize.toString();

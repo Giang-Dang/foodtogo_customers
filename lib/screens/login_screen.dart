@@ -52,7 +52,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         setState(() {
           _isLoginFailed = true;
         });
-      } else { 
+      } else {
         //login failed
         setState(() {
           _isLoginFailed = false;
@@ -87,7 +87,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('FoodToGo - Customer'),
+        title: const Text('FoodToGo - Customers'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(35, 25, 40, 0),

@@ -5,7 +5,7 @@ import 'package:foodtogo_customers/models/merchant.dart';
 import 'package:foodtogo_customers/services/merchant_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
-import 'package:foodtogo_customers/widgets/merchant_list.dart';
+import 'package:foodtogo_customers/widgets/merchant_card_list.dart';
 
 class NearbyMerchantsWidget extends StatefulWidget {
   const NearbyMerchantsWidget({Key? key}) : super(key: key);
@@ -30,6 +30,7 @@ class _NearbyMerchantsWidgetState extends State<NearbyMerchantsWidget> {
     }
 
     final nearbyMerchantList = await merchantServices.getAllMerchants(
+        isDeleted: false,
         startLatitude: UserServices.currentLatitude,
         startLongitude: UserServices.currentLongitude,
         searchDistanceInKm: nearbyDistance);
@@ -65,7 +66,7 @@ class _NearbyMerchantsWidgetState extends State<NearbyMerchantsWidget> {
     if (!_isLoading) {
       merchantListcontain = Row(
         children: [
-          MerchantList(merchantList: _nearbyMerchantList),
+          MerchantCardList(merchantList: _nearbyMerchantList),
         ],
       );
     }

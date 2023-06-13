@@ -6,7 +6,7 @@ import 'package:foodtogo_customers/models/menu_item.dart';
 import 'package:foodtogo_customers/services/menu_item_services.dart';
 import 'package:foodtogo_customers/services/menu_item_type_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
-import 'package:foodtogo_customers/widgets/menu_item_list.dart';
+import 'package:foodtogo_customers/widgets/menu_item_card_list.dart';
 
 class TopSnacksWidget extends StatefulWidget {
   const TopSnacksWidget({Key? key}) : super(key: key);
@@ -39,6 +39,7 @@ class _TopSnacksWidgetState extends State<TopSnacksWidget> {
     }
 
     var menuItemList = await menuItemServices.getAll(
+      isClosed: false,
       minRating: 4,
       searchItemTypeId: menuItemTypeDTO.id,
     );
@@ -79,7 +80,7 @@ class _TopSnacksWidgetState extends State<TopSnacksWidget> {
     if (!_isLoading) {
       merchantListcontain = Row(
         children: [
-          MenuItemList(menuItemList: _menuItemList),
+          MenuItemCardList(menuItemList: _menuItemList),
         ],
       );
     }

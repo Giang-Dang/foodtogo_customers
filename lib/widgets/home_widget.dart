@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/widgets/nearby_merchants_widget.dart';
 import 'package:foodtogo_customers/widgets/promotion_merchants_widget.dart';
+import 'package:foodtogo_customers/widgets/search_button_widget.dart';
 import 'package:foodtogo_customers/widgets/top_drinks_widget.dart';
 import 'package:foodtogo_customers/widgets/top_main_courses_widget.dart';
 import 'package:foodtogo_customers/widgets/top_snacks_widget.dart';
@@ -32,6 +33,9 @@ class _HomeWidgetState extends State<HomeWidget> {
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
+              SizedBox(height: 40),
+              SearchButtonWidget(),
+              SizedBox(height: 10),
               PromotionMerchantsWidget(),
               SizedBox(height: 20),
               NearbyMerchantsWidget(),

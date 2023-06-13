@@ -5,7 +5,7 @@ import 'package:foodtogo_customers/models/merchant.dart';
 import 'package:foodtogo_customers/models/promotion.dart';
 import 'package:foodtogo_customers/services/promotion_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
-import 'package:foodtogo_customers/widgets/merchant_list.dart';
+import 'package:foodtogo_customers/widgets/merchant_card_list.dart';
 import 'package:foodtogo_customers/widgets/promotion_list.dart';
 
 class PromotionMerchantsWidget extends StatefulWidget {
