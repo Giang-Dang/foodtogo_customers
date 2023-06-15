@@ -7,11 +7,11 @@ import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
 
 class FavoriteMenuItemServices {
-  static const favoriteMenuItemTbName = 'favorite_menu_item';
+  static const kFavoriteMenuItemTbName = 'favorite_menu_item';
 
   Future<List<MenuItem>> getAllFavoriteMenuItems() async {
     final db = await _getFavoriteMenuItemDatabase();
-    final table = await db.query(favoriteMenuItemTbName);
+    final table = await db.query(kFavoriteMenuItemTbName);
 
     List<MenuItem> menuItemList = [];
     final menuItemServices = MenuItemServices();
@@ -35,7 +35,7 @@ class FavoriteMenuItemServices {
     try {
       final db = await _getFavoriteMenuItemDatabase();
 
-      db.insert(favoriteMenuItemTbName, {
+      db.insert(kFavoriteMenuItemTbName, {
         'menuItemId': menuItemId,
       });
     } catch (e) {
@@ -49,7 +49,7 @@ class FavoriteMenuItemServices {
   Future<bool> removeFavoriteMenuItem(int menuItemId) async {
     try {
       final db = await _getFavoriteMenuItemDatabase();
-      int rowCount = await db.delete(favoriteMenuItemTbName,
+      int rowCount = await db.delete(kFavoriteMenuItemTbName,
           where: 'menuItemId = ?', whereArgs: [menuItemId]);
       log('removeFavoriteMenuItem affects $rowCount row(s).');
     } catch (e) {
@@ -61,7 +61,7 @@ class FavoriteMenuItemServices {
 
   Future<bool> containsMenuItemId(int menuItemId) async {
     final db = await _getFavoriteMenuItemDatabase();
-    final result = await db.query(favoriteMenuItemTbName,
+    final result = await db.query(kFavoriteMenuItemTbName,
         where: 'menuItemId = ?', whereArgs: [menuItemId]);
         
     return result.isNotEmpty;
@@ -70,10 +70,10 @@ class FavoriteMenuItemServices {
   Future<Database> _getFavoriteMenuItemDatabase() async {
     final dbPath = await sql.getDatabasesPath();
     final db = await sql.openDatabase(
-      path.join(dbPath, '$favoriteMenuItemTbName.db'),
+      path.join(dbPath, '$kFavoriteMenuItemTbName.db'),
       onCreate: (db, version) {
         return db.execute(
-            'CREATE TABLE $favoriteMenuItemTbName(menuItemId INTEGER PRIMARY KEY)');
+            'CREATE TABLE $kFavoriteMenuItemTbName(menuItemId INTEGER PRIMARY KEY)');
       },
       version: 1,
     );

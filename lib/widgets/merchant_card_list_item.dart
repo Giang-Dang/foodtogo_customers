@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/models/merchant.dart';
+import 'package:foodtogo_customers/providers/favorite_merchant_list_provider.dart';
+import 'package:foodtogo_customers/screens/merchant_screen.dart';
 import 'package:foodtogo_customers/services/delivery_services.dart';
 import 'package:foodtogo_customers/services/favorite_merchant_services.dart';
 import 'package:foodtogo_customers/services/merchant_services.dart';
@@ -11,7 +14,7 @@ import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/settings/secrets.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-class MerchantCardListItem extends StatefulWidget {
+class MerchantCardListItem extends ConsumerStatefulWidget {
   const MerchantCardListItem({
     Key? key,
     required this.merchant,
@@ -22,10 +25,11 @@ class MerchantCardListItem extends StatefulWidget {
   final double maxHeight;
 
   @override
-  State<MerchantCardListItem> createState() => _MerchantCardListItemState();
+  ConsumerState<MerchantCardListItem> createState() =>
+      _MerchantCardListItemState();
 }
 
-class _MerchantCardListItemState extends State<MerchantCardListItem> {
+class _MerchantCardListItemState extends ConsumerState<MerchantCardListItem> {
   bool _isFavorite = false;
   Timer? _initTimer;
 
@@ -41,7 +45,7 @@ class _MerchantCardListItemState extends State<MerchantCardListItem> {
     }
   }
 
-  _onFavoriteTab(int merchantId) {
+  _onFavoriteTab(int merchantId) async {
     final isFavorite = !_isFavorite;
 
     final favoriteMerchantServices = FavoriteMerchantServices();
@@ -51,6 +55,9 @@ class _MerchantCardListItemState extends State<MerchantCardListItem> {
     } else {
       favoriteMerchantServices.removeFavoriteMerchant(merchantId);
     }
+
+    final merchantList = await favoriteMerchantServices.getAllMerchants();
+    ref.watch(favoriteMerchantListProvider.notifier).update(merchantList);
 
     if (mounted) {
       setState(() {
@@ -104,7 +111,15 @@ class _MerchantCardListItemState extends State<MerchantCardListItem> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                if (context.mounted) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => MerchantScreen(merchant: merchant),
+                    ),
+                  );
+                }
+              },
               child: Container(
                 width: 130,
                 height: maxHeight - 30,
@@ -115,17 +130,20 @@ class _MerchantCardListItemState extends State<MerchantCardListItem> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: FadeInImage(
-                            height: 65,
-                            width: 110,
-                            placeholder: MemoryImage(kTransparentImage),
-                            image: NetworkImage(
-                              imageUrl,
-                              headers: {
-                                'Authorization': 'Bearer $jwtToken',
-                              },
+                          child: Hero(
+                            tag: merchant.merchantId,
+                            child: FadeInImage(
+                              height: 65,
+                              width: 110,
+                              placeholder: MemoryImage(kTransparentImage),
+                              image: NetworkImage(
+                                imageUrl,
+                                headers: {
+                                  'Authorization': 'Bearer $jwtToken',
+                                },
+                              ),
+                              fit: BoxFit.cover,
                             ),
-                            fit: BoxFit.cover,
                           ),
                         ),
                         const SizedBox(height: 4),

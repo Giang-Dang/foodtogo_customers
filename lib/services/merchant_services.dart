@@ -72,7 +72,7 @@ class MerchantServices {
     return null;
   }
 
-  Future<List<Merchant>> getAllMerchants({
+  Future<List<Merchant>> getAll({
     DateTime? openHoursCheckTime,
     String? searchName,
     double? startLatitude,
@@ -84,7 +84,7 @@ class MerchantServices {
   }) async {
     final merchantProfileImageServices = MerchantProfileImageServices();
     final merchantRatingServices = MerchantRatingServices();
-    final merchantDTOsList = await getAllMerchantDTOs(
+    final merchantDTOsList = await getAllDTOs(
         openHoursCheckTime: openHoursCheckTime,
         searchName: searchName,
         startLatitude: startLatitude,
@@ -124,7 +124,7 @@ class MerchantServices {
     return merchantsList;
   }
 
-  Future<List<MerchantDTO>> getAllMerchantDTOs({
+  Future<List<MerchantDTO>> getAllDTOs({
     DateTime? openHoursCheckTime,
     String? searchName,
     double? startLatitude,
@@ -211,7 +211,7 @@ class MerchantServices {
   }
 
   Future<List<MerchantDTO>> getAllMerchantsDTOFromUser() async {
-    final userId = int.parse(UserServices.strUserId);
+    final userId = UserServices.userId;
     final newApiUrl = '$_apiUrl/byuser/$userId';
     final url = Uri.http(Secrets.kFoodToGoAPILink, newApiUrl);
     final jwtToken = UserServices.jwtToken;

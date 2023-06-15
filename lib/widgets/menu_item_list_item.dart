@@ -2,27 +2,34 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/models/menu_item.dart';
+import 'package:foodtogo_customers/providers/favorite_menu_item_list_provider.dart';
 import 'package:foodtogo_customers/services/favorite_menu_item_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/settings/secrets.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-class MenuItemListItem extends StatefulWidget {
+class MenuItemListItem extends ConsumerStatefulWidget {
   const MenuItemListItem({
     Key? key,
     required this.menuItem,
+    this.addToCart,
   }) : super(key: key);
 
   final MenuItem menuItem;
+  final Function(GlobalKey widgetKey, MenuItem menuItem)? addToCart;
 
   @override
-  State<MenuItemListItem> createState() => _MenuItemListItemState();
+  ConsumerState<MenuItemListItem> createState() => _MenuItemListItemState();
 }
 
-class _MenuItemListItemState extends State<MenuItemListItem> {
+class _MenuItemListItemState extends ConsumerState<MenuItemListItem> {
+  final GlobalKey itemAddToCartKey = GlobalKey();
+
   bool _isFavorite = false;
+
   Timer? _initTimer;
 
   _initial(int menuItemId) async {
@@ -37,7 +44,7 @@ class _MenuItemListItemState extends State<MenuItemListItem> {
     }
   }
 
-  _onFavoriteTab(int menuItemId) {
+  _onFavoriteTab(int menuItemId) async {
     final isFavorite = !_isFavorite;
 
     final favoriteMenuItemServices = FavoriteMenuItemServices();
@@ -48,6 +55,15 @@ class _MenuItemListItemState extends State<MenuItemListItem> {
       favoriteMenuItemServices.removeFavoriteMenuItem(menuItemId);
     }
 
+    final menuItemList =
+        await favoriteMenuItemServices.getAllFavoriteMenuItems();
+    ref.watch(favoriteMenuItemListProvider.notifier).update(menuItemList);
+  }
+
+  _getFavoriteStatus(int menuItemId) async {
+    final favoriteMenuItemServices = FavoriteMenuItemServices();
+    final isFavorite =
+        await favoriteMenuItemServices.containsMenuItemId(menuItemId);
     if (mounted) {
       setState(() {
         _isFavorite = isFavorite;
@@ -81,119 +97,133 @@ class _MenuItemListItemState extends State<MenuItemListItem> {
 
     final double deviceWidth = MediaQuery.of(context).size.width;
 
+    _getFavoriteStatus(menuItem.id);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-      child: Container(
-        width: deviceWidth - 20,
-        height: 120,
-        decoration: BoxDecoration(
-          color: KColors.kOnBackgroundColor,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 3,
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            )
-          ],
-        ),
-        child: Row(
-          children: [
-            const SizedBox(width: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: InkWell(
-                onTap: () {},
-                child: FadeInImage(
-                  placeholder: MemoryImage(kTransparentImage),
-                  image: NetworkImage(
-                    imageUrl,
-                    headers: {
-                      'Authorization': 'Bearer $jwtToken',
-                    },
+      child: GestureDetector(
+        onTap: () {},
+        child: Container(
+          width: deviceWidth - 20,
+          height: 120,
+          decoration: BoxDecoration(
+            color: KColors.kOnBackgroundColor,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 3,
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              )
+            ],
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 10),
+              Container(
+                key: itemAddToCartKey,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: FadeInImage(
+                    placeholder: MemoryImage(kTransparentImage),
+                    image: NetworkImage(
+                      imageUrl,
+                      headers: {
+                        'Authorization': 'Bearer $jwtToken',
+                      },
+                    ),
+                    height: 100,
+                    width: 120,
+                    fit: BoxFit.cover,
                   ),
-                  height: 100,
-                  width: 120,
-                  fit: BoxFit.cover,
                 ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  const SizedBox(width: 10),
-                  Text(
-                    menuItem.name,
-                    style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: KColors.kPrimaryColor),
-                  ),
-                  Text(
-                    '${menuItem.description}\n',
-                    style: const TextStyle(fontSize: 12, color: KColors.kGrey),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        menuItem.rating.toStringAsFixed(1),
-                        style: const TextStyle(
-                            fontSize: 14, color: KColors.kLightTextColor),
-                      ),
-                      const SizedBox(width: 3),
-                      RatingBarIndicator(
-                        rating: menuItem.rating,
-                        itemBuilder: (context, index) => const Icon(
-                          Icons.star,
-                          color: Colors.amber,
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    const SizedBox(width: 10),
+                    Text(
+                      menuItem.name,
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: KColors.kPrimaryColor),
+                    ),
+                    Text(
+                      '${menuItem.description}\n',
+                      style:
+                          const TextStyle(fontSize: 12, color: KColors.kGrey),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          menuItem.rating.toStringAsFixed(1),
+                          style: const TextStyle(
+                              fontSize: 12.5, color: KColors.kLightTextColor),
                         ),
-                        itemSize: 20,
-                      )
-                    ],
-                  ),
-                  Text(
-                    '\$${menuItem.unitPrice.toStringAsFixed(1)}',
-                    style: const TextStyle(
-                      fontSize: 16,
+                        const SizedBox(width: 3),
+                        RatingBarIndicator(
+                          rating: menuItem.rating,
+                          itemBuilder: (context, index) => const Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          itemSize: 16,
+                        )
+                      ],
+                    ),
+                    Text(
+                      '\$${menuItem.unitPrice.toStringAsFixed(1)}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: KColors.kPrimaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 2,
+                    )
+                  ],
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      _onFavoriteTab(menuItem.id);
+                    },
+                    icon: Icon(
+                      _isFavorite ? Icons.favorite : Icons.favorite_border,
                       color: KColors.kPrimaryColor,
-                      fontWeight: FontWeight.bold,
+                      size: 26,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      if (widget.addToCart != null) {
+                        widget.addToCart!(itemAddToCartKey, menuItem);
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.add,
+                      color: KColors.kPrimaryColor,
+                      size: 26,
                     ),
                   ),
                 ],
               ),
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    _onFavoriteTab(menuItem.id);
-                  },
-                  icon: Icon(
-                    _isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: KColors.kPrimaryColor,
-                    size: 26,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.shopping_cart_outlined,
-                    color: KColors.kPrimaryColor,
-                    size: 26,
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

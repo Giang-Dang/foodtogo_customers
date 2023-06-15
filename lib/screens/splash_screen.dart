@@ -3,8 +3,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodtogo_customers/models/dto/create_dto/online_customer_location_create_dto.dart';
+import 'package:foodtogo_customers/models/online_customer_location.dart';
 import 'package:foodtogo_customers/screens/login_screen.dart';
 import 'package:foodtogo_customers/screens/tabs_screen.dart';
+import 'package:foodtogo_customers/services/online_customer_location_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 
@@ -25,7 +28,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   _login() async {
     //delay for animation
-    await _delay(100);
+    // await _delay(100);
     //loading data
     final userServices = UserServices();
 
@@ -33,6 +36,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     await userServices.checkLocalLoginAuthorized();
     if (UserServices.isAuthorized) {
+      //update location to server
+      final onlineCustomerLocationCreateDTO = OnlineCustomerLocationCreateDTO(
+        customerId: UserServices.userId!,
+        geoLatitude: UserServices.currentLatitude,
+        geoLongitude: UserServices.currentLongitude,
+      );
+
+      final onlineCustomerLocationSevices = OnlineCustomerLocationServices();
+      onlineCustomerLocationSevices.create(onlineCustomerLocationCreateDTO);
+
+      //route
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
@@ -70,7 +84,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     //login
     _loginTimer = Timer.periodic(
-      const Duration(milliseconds: 500),
+      const Duration(milliseconds: 100),
       (timer) {
         _login();
         _loginTimer?.cancel();

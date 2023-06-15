@@ -23,7 +23,7 @@ const kUserIdKeyName = 'userId';
 class UserServices {
   static bool isAuthorized = false;
   static String jwtToken = "";
-  static String strUserId = "";
+  static int? userId = 0;
   static double currentLongitude = 0.0;
   static double currentLatitude = 0.0;
 
@@ -112,11 +112,11 @@ class UserServices {
       );
 
       saveLoginInfo(responseObject['result']['token'] as String,
-          responseObject['result']['user']['id'].toString());
+          responseObject['result']['user']['id'] as int);
       //set static values
       isAuthorized = true;
       jwtToken = responseObject['result']['token'] as String;
-      strUserId = responseObject['result']['user']['id'].toString();
+      userId = responseObject['result']['user']['id'] as int;
     } else {
       loginResponseDTO = LoginResponseDTO(
         isSuccess: responseObject['isSuccess'],
@@ -128,19 +128,19 @@ class UserServices {
 
   Future<void> checkLocalLoginAuthorized() async {
     jwtToken = await getLoginToken() ?? "";
-    strUserId = await getStoredUserId() ?? "";
+    int? userId = int.tryParse(await getStoredUserId() ?? "");
     // print('jwtToken $jwtToken');
     // print('strUserId $strUserId');
-    if (jwtToken == "" || strUserId == "") {
+    if (jwtToken == "" || userId == null || userId == 0) {
       isAuthorized = false;
-      jwtToken == "";
-      strUserId == "";
+      jwtToken = "";
+      userId = null;
       return;
     }
 
-    final merchantAPIByUserIdLink = 'api/MerchantAPI/byuser/$strUserId';
+    final merchantAPIByUserIdLink = 'api/MerchantAPI/byuser/$userId';
     final url =
-        Uri.http('${Secrets.kFoodToGoAPILink}', '$merchantAPIByUserIdLink');
+        Uri.http(Secrets.kFoodToGoAPILink, merchantAPIByUserIdLink);
 
     final responseJson = await http.get(
       url,
@@ -156,8 +156,8 @@ class UserServices {
     }
 
     isAuthorized = false;
-    jwtToken == "";
-    strUserId == "";
+    jwtToken = "";
+    userId = null;
     return;
   }
 
@@ -195,12 +195,12 @@ class UserServices {
     return storage;
   }
 
-  Future<void> saveLoginInfo(String token, String strUserId) async {
+  Future<void> saveLoginInfo(String token, int userId) async {
     final storage = getSecureStorage();
     await storage.delete(key: kTokenKeyName);
     await storage.delete(key: kUserIdKeyName);
     await storage.write(key: kTokenKeyName, value: token);
-    await storage.write(key: kUserIdKeyName, value: strUserId);
+    await storage.write(key: kUserIdKeyName, value: userId.toString());
   }
 
   Future<void> deleteStoredLoginInfo() async {

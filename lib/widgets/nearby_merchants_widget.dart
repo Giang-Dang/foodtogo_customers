@@ -29,7 +29,7 @@ class _NearbyMerchantsWidgetState extends State<NearbyMerchantsWidget> {
       });
     }
 
-    final nearbyMerchantList = await merchantServices.getAllMerchants(
+    final nearbyMerchantList = await merchantServices.getAll(
         isDeleted: false,
         startLatitude: UserServices.currentLatitude,
         startLongitude: UserServices.currentLongitude,

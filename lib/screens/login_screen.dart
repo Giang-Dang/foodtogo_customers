@@ -1,10 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodtogo_customers/models/dto/create_dto/online_customer_location_create_dto.dart';
 import 'package:foodtogo_customers/models/dto/login_request_dto.dart';
 import 'package:foodtogo_customers/models/enum/login_from_app.dart';
 import 'package:foodtogo_customers/screens/tabs_screen.dart';
 import 'package:foodtogo_customers/screens/user_register_screen.dart';
+import 'package:foodtogo_customers/services/online_customer_location_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 
@@ -41,6 +43,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
 
       final loginResponseDTO = await _userServices.login(loginRequestDTO);
+      final userServices = UserServices();
+      await userServices.getUserLocation();
+
+      await userServices.checkLocalLoginAuthorized();
+      if (UserServices.isAuthorized) {
+        //update location to server
+        final onlineCustomerLocationCreateDTO = OnlineCustomerLocationCreateDTO(
+          customerId: UserServices.userId!,
+          geoLatitude: UserServices.currentLatitude,
+          geoLongitude: UserServices.currentLongitude,
+        );
+
+        final onlineCustomerLocationSevices = OnlineCustomerLocationServices();
+        onlineCustomerLocationSevices.create(onlineCustomerLocationCreateDTO);
+      }
 
       if (mounted) {
         setState(() {

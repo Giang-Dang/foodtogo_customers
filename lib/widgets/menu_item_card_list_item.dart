@@ -1,14 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/models/menu_item.dart';
+import 'package:foodtogo_customers/providers/favorite_menu_item_list_provider.dart';
 import 'package:foodtogo_customers/services/favorite_menu_item_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/settings/secrets.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-class MenuItemCardListItem extends StatefulWidget {
+class MenuItemCardListItem extends ConsumerStatefulWidget {
   const MenuItemCardListItem({
     Key? key,
     required this.menuItem,
@@ -19,10 +21,11 @@ class MenuItemCardListItem extends StatefulWidget {
   final double maxHeight;
 
   @override
-  State<MenuItemCardListItem> createState() => _MenuItemCardListItemState();
+  ConsumerState<MenuItemCardListItem> createState() =>
+      _MenuItemCardListItemState();
 }
 
-class _MenuItemCardListItemState extends State<MenuItemCardListItem> {
+class _MenuItemCardListItemState extends ConsumerState<MenuItemCardListItem> {
   bool _isFavorite = false;
   Timer? _initTimer;
 
@@ -38,16 +41,21 @@ class _MenuItemCardListItemState extends State<MenuItemCardListItem> {
     }
   }
 
-  _onFavoriteTab(int menuItemId) {
+  _onFavoriteTab(int menuItemId) async {
     final isFavorite = !_isFavorite;
 
     final favoriteMenuItemServices = FavoriteMenuItemServices();
 
     if (isFavorite) {
       favoriteMenuItemServices.addFavoriteMenuItem(menuItemId);
+      
     } else {
       favoriteMenuItemServices.removeFavoriteMenuItem(menuItemId);
     }
+
+    final menuItemList =
+        await favoriteMenuItemServices.getAllFavoriteMenuItems();
+    ref.watch(favoriteMenuItemListProvider.notifier).update(menuItemList);
 
     if (mounted) {
       setState(() {
