@@ -28,22 +28,21 @@ class _PromotionListState extends State<PromotionList> {
       height: containerHeight,
       width: deviceWidth,
       color: KColors.kBackgroundColor,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: SizedBox(
-          width: deviceWidth,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              const SizedBox(width: 15),
-              for (var promotion in promotionList)
-                PromotionListItem(
-                  promotion: promotion,
-                  maxHeight: containerHeight,
-                ),
-              const SizedBox(width: 15),
-            ],
-          ),
+      child: SizedBox(
+        width: deviceWidth,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: promotionList.length + 2,
+          itemBuilder: (context, index) {
+            if (index == 0 || index == promotionList.length + 1) {
+              return const SizedBox(width: 15);
+            } else {
+              return PromotionListItem(
+                promotion: promotionList[index - 1],
+                maxHeight: containerHeight,
+              );
+            }
+          },
         ),
       ),
     );

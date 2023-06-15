@@ -27,22 +27,22 @@ class _MerchantCardListState extends State<MerchantCardList> {
       height: containerHeight,
       width: deviceWidth,
       color: KColors.kBackgroundColor,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: SizedBox(
-          width: deviceWidth,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              const SizedBox(width: 15),
-              for (var merchant in merchantList)
-                MerchantCardListItem(
-                  merchant: merchant,
-                  maxHeight: containerHeight,
-                ),
-              const SizedBox(width: 15),
-            ],
-          ),
+      child: SizedBox(
+        width: deviceWidth,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: merchantList.length + 2,
+          itemBuilder: (context, index) {
+            if (index == 0 || index == merchantList.length + 1) {
+              return const SizedBox(width: 15);
+            } else {
+              return MerchantCardListItem(
+                key: ValueKey(merchantList[index - 1].merchantId),
+                merchant: merchantList[index - 1],
+                maxHeight: containerHeight,
+              );
+            }
+          },
         ),
       ),
     );

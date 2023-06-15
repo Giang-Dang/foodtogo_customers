@@ -28,7 +28,7 @@ class _SearchMenuItemListState extends State<SearchMenuItemList>
   Timer? _initTimer;
   bool _isLoading = true;
 
-  _initial() async {
+  _initialize() async {
     final menuItemTypeServices = MenuItemTypeServices();
 
     if (mounted) {
@@ -61,7 +61,7 @@ class _SearchMenuItemListState extends State<SearchMenuItemList>
     // TODO: implement initState
     super.initState();
     _initTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      _initial();
+      _initialize();
       _initTimer?.cancel();
     });
   }

@@ -128,7 +128,8 @@ class UserServices {
 
   Future<void> checkLocalLoginAuthorized() async {
     jwtToken = await getLoginToken() ?? "";
-    int? userId = int.tryParse(await getStoredUserId() ?? "");
+    final queryUserId = await getStoredUserId();
+    userId = int.tryParse(queryUserId ?? "");
     // print('jwtToken $jwtToken');
     // print('strUserId $strUserId');
     if (jwtToken == "" || userId == null || userId == 0) {
@@ -139,8 +140,7 @@ class UserServices {
     }
 
     final merchantAPIByUserIdLink = 'api/MerchantAPI/byuser/$userId';
-    final url =
-        Uri.http(Secrets.kFoodToGoAPILink, merchantAPIByUserIdLink);
+    final url = Uri.http(Secrets.kFoodToGoAPILink, merchantAPIByUserIdLink);
 
     final responseJson = await http.get(
       url,

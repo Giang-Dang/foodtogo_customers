@@ -29,7 +29,7 @@ class _FavoriteWidgetState extends ConsumerState<FavoriteWidget>
   List<MenuItem> _menuItemList = [];
   List<Merchant> _merchantList = [];
 
-  _initial() async {
+  _initialize() async {
     final favoriteMenuItemServices = FavoriteMenuItemServices();
     final favoriteMerchantServices = FavoriteMerchantServices();
 
@@ -82,7 +82,7 @@ class _FavoriteWidgetState extends ConsumerState<FavoriteWidget>
       _setTabColor();
     });
     _initTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      _initial();
+      _initialize();
       _initTimer?.cancel();
     });
   }

@@ -42,12 +42,20 @@ class _TopSnacksWidgetState extends State<TopSnacksWidget> {
       isClosed: false,
       minRating: 4,
       searchItemTypeId: menuItemTypeDTO.id,
+      pageNumber: 1,
+      pageSize: 10,
     );
 
     if (menuItemList == null) {
       log('_TopMainCoursesWidgetState._getMenuItemList() menuItemList == null');
       return;
     }
+
+    menuItemList.sort(
+      (a, b) {
+        return (b.rating * 10 - a.rating * 10).round();
+      },
+    );
 
     if (mounted) {
       setState(() {
@@ -91,7 +99,7 @@ class _TopSnacksWidgetState extends State<TopSnacksWidget> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 0, 5),
           child: Text(
-            "Top Drinks",
+            "Top Snacks",
             style: Theme.of(context)
                 .textTheme
                 .titleLarge!

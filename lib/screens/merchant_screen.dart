@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/models/menu_item.dart';
 import 'package:foodtogo_customers/models/merchant.dart';
 import 'package:foodtogo_customers/providers/favorite_merchant_list_provider.dart';
+import 'package:foodtogo_customers/screens/cart_screen.dart';
 import 'package:foodtogo_customers/services/cart_services.dart';
 import 'package:foodtogo_customers/services/delivery_services.dart';
 import 'package:foodtogo_customers/services/favorite_merchant_services.dart';
@@ -15,7 +16,6 @@ import 'package:foodtogo_customers/services/merchant_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/settings/secrets.dart';
-import 'package:foodtogo_customers/widgets/menu_item_list.dart';
 import 'package:foodtogo_customers/widgets/merchant_menu_item_list.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -47,6 +47,7 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
     final favoriteMerchantServices = FavoriteMerchantServices();
     final isFavorite =
         await favoriteMerchantServices.containsMerchantId(merchantId);
+
     if (mounted) {
       setState(() {
         _isFavorite = isFavorite;
@@ -67,6 +68,7 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
 
     final merchantList = await favoriteMerchantServices.getAllMerchants();
     ref.watch(favoriteMerchantListProvider.notifier).update(merchantList);
+
 
     if (mounted) {
       setState(() {
@@ -101,6 +103,7 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
     bool isAddingSuccess =
         await cartServices.addMenuItem(menuItem, quantity + 1);
 
+
     if (isAddingSuccess) {
       //animation
       await runAddToCartAnimation(widgetKey);
@@ -115,13 +118,19 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
     if (cartKey.currentState != null) {
       await cartKey.currentState!.updateBadge(totalQuantity.toString());
     }
+
   }
 
   _initial(int merchantId) {
     _getMenuItemList(merchantId);
   }
 
-  _onFloatingActionButtonPressed() {}
+  _onFloatingActionButtonPressed() {
+    if (context.mounted) {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const CartScreen()));
+    }
+  }
 
   @override
   void initState() {
@@ -207,6 +216,7 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
           children: [
             Container(
               color: KColors.kBackgroundColor,
+              width: deviceWidth,
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,27 +238,30 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
                       ),
                     ),
                     Container(
-                      width: double.infinity,
+                      width: deviceWidth,
                       height: 100,
                       color: KColors.kOnBackgroundColor,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.max,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.max,
                               children: [
-                                Text(
-                                  '${merchant.name}\n',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge!
-                                      .copyWith(color: KColors.kTextColor),
-                                  textAlign: TextAlign.start,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                                SizedBox(
+                                  width: deviceWidth - 100,
+                                  child: Text(
+                                    '${merchant.name}\n',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge!
+                                        .copyWith(color: KColors.kTextColor),
+                                    textAlign: TextAlign.start,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                                 const SizedBox(height: 10),
                                 IntrinsicHeight(
@@ -315,6 +328,9 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
                     ),
                     const SizedBox(height: 20),
                     menuItemListContent,
+                    const SizedBox(
+                      height: 80,
+                    )
                   ],
                 ),
               ),

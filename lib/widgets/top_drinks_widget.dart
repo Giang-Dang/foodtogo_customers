@@ -42,12 +42,20 @@ class _TopDrinksWidgetState extends State<TopDrinksWidget> {
       isClosed: false,
       minRating: 4,
       searchItemTypeId: menuItemTypeDTO.id,
+      pageNumber: 1,
+      pageSize: 10,
     );
 
     if (menuItemList == null) {
       log('_TopMainCoursesWidgetState._getMenuItemList() menuItemList == null');
       return;
     }
+
+    menuItemList.sort(
+      (a, b) {
+        return (b.rating * 10 - a.rating * 10).round();
+      },
+    );
 
     if (mounted) {
       setState(() {

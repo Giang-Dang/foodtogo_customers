@@ -38,6 +38,7 @@ class _MerchantCardListItemState extends ConsumerState<MerchantCardListItem> {
     final isFavorite =
         await favoriteMerchantServices.containsMerchantId(merchantId);
 
+
     if (mounted) {
       setState(() {
         _isFavorite = isFavorite;
@@ -58,6 +59,7 @@ class _MerchantCardListItemState extends ConsumerState<MerchantCardListItem> {
 
     final merchantList = await favoriteMerchantServices.getAllMerchants();
     ref.watch(favoriteMerchantListProvider.notifier).update(merchantList);
+
 
     if (mounted) {
       setState(() {

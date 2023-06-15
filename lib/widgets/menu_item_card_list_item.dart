@@ -34,6 +34,7 @@ class _MenuItemCardListItemState extends ConsumerState<MenuItemCardListItem> {
     final isFavorite =
         await favoriteMenuItemServices.containsMenuItemId(menuItemId);
 
+
     if (mounted) {
       setState(() {
         _isFavorite = isFavorite;
@@ -56,6 +57,7 @@ class _MenuItemCardListItemState extends ConsumerState<MenuItemCardListItem> {
     final menuItemList =
         await favoriteMenuItemServices.getAllFavoriteMenuItems();
     ref.watch(favoriteMenuItemListProvider.notifier).update(menuItemList);
+
 
     if (mounted) {
       setState(() {

@@ -11,11 +11,13 @@ import 'package:path/path.dart' as path;
 
 class CartServices {
   static const kCardDbName = 'cart';
+  static Database? db;
 
   Future<List<Merchant>> getAllMerchants() async {
-    final db = await _getCartDatabase();
-    final table = await db.query(
+    db ??= await _getCartDatabase();
+    final table = await db!.query(
       kCardDbName,
+      columns: ['merchantId'],
       where: 'userId = ?',
       whereArgs: [UserServices.userId],
     );
@@ -32,6 +34,10 @@ class CartServices {
         continue;
       }
 
+      if (merchantList.contains(merchant)) {
+        continue;
+      }
+
       merchantList.add(merchant);
     }
 
@@ -39,8 +45,8 @@ class CartServices {
   }
 
   Future<List<MenuItem>> getAllMenuItemsByMerchantId(int merchantId) async {
-    final db = await _getCartDatabase();
-    final table = await db.query(
+    db ??= await _getCartDatabase();
+    final table = await db!.query(
       kCardDbName,
       where: 'userId = ? AND merchantId = ?',
       whereArgs: [UserServices.userId, merchantId],
@@ -58,6 +64,10 @@ class CartServices {
         continue;
       }
 
+      if (menuItemList.contains(menuItem)) {
+        continue;
+      }
+
       menuItemList.add(menuItem);
     }
 
@@ -65,8 +75,8 @@ class CartServices {
   }
 
   Future<int> getQuantity(int menuItemId) async {
-    final db = await _getCartDatabase();
-    final table = await db.query(
+    db ??= await _getCartDatabase();
+    final table = await db!.query(
       kCardDbName,
       where: 'userId = ? AND menuItemId = ?',
       whereArgs: [UserServices.userId, menuItemId],
@@ -89,12 +99,13 @@ class CartServices {
   }
 
   Future<int> getTotalQuantity() async {
-    final db = await _getCartDatabase();
-    final result = await db.rawQuery(
+    db ??= await _getCartDatabase();
+    final result = await db!.rawQuery(
         'SELECT SUM(quantity) as totalQuantity FROM $kCardDbName WHERE userId = ?',
         [UserServices.userId]);
 
-    int totalQuantity = result[0]['totalQuantity'] as int;
+    int totalQuantity =
+        int.tryParse(result[0]['totalQuantity'].toString()) ?? 0;
 
     return totalQuantity;
   }
@@ -115,8 +126,8 @@ class CartServices {
   }
 
   Future<bool> containsMenuItem(MenuItem menuItem) async {
-    final db = await _getCartDatabase();
-    final result = await db.query(
+    db ??= await _getCartDatabase();
+    final result = await db!.query(
       kCardDbName,
       where: 'userId = ? AND menuItemId = ?',
       whereArgs: [UserServices.userId, menuItem.id],
@@ -127,14 +138,15 @@ class CartServices {
 
   Future<bool> insert(MenuItem menuItem, int quantity) async {
     try {
-      final db = await _getCartDatabase();
+      db ??= await _getCartDatabase();
 
-      int id = await db.insert(kCardDbName, {
+      int id = await db!.insert(kCardDbName, {
         'userId': UserServices.userId,
         'menuItemId': menuItem.id,
         'merchantId': menuItem.merchantId,
         'quantity': quantity,
       });
+
       log('CartServices.insert() affects menuItemId $id.');
     } catch (e) {
       log('CartServices.insert() $e');
@@ -146,9 +158,9 @@ class CartServices {
 
   Future<bool> update(MenuItem menuItem, int newQuantity) async {
     try {
-      final db = await _getCartDatabase();
+      db ??= await _getCartDatabase();
 
-      int rowCount = await db.update(
+      int rowCount = await db!.update(
         kCardDbName,
         {
           'quantity': newQuantity,
@@ -156,6 +168,7 @@ class CartServices {
         where: 'userId = ? AND menuItemId = ?',
         whereArgs: [UserServices.userId, menuItem.id],
       );
+
       log('CartServices.update() affects $rowCount row(s).');
     } catch (e) {
       log('CartServices.update() $e');
@@ -167,14 +180,16 @@ class CartServices {
 
   Future<bool> delete(MenuItem menuItem) async {
     try {
-      final db = await _getCartDatabase();
+      db ??= await _getCartDatabase();
 
-      int rowCount = await db.delete(kCardDbName,
+      int rowCount = await db!.delete(kCardDbName,
           where: 'userId = ? AND menuItemId = ?',
           whereArgs: [UserServices.userId, menuItem.id]);
+
       log('CartServices.delete() affects $rowCount row(s).');
     } catch (e) {
       log('CartServices.delete() $e');
+
       return false;
     }
 
@@ -192,5 +207,9 @@ class CartServices {
       version: 1,
     );
     return db;
+  }
+
+  closeDb() async {
+    await db?.close();
   }
 }

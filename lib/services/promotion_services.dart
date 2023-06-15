@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:foodtogo_customers/models/dto/create_dto/promotion_create_dto.dart';
 import 'package:foodtogo_customers/models/dto/promotion_dto.dart';
@@ -296,5 +297,34 @@ class PromotionServices {
     inspect(updateJson);
 
     return false;
+  }
+
+  Future<double> calPromotionDiscount(int promotionId, double subTotal) async {
+    final promotionServices = PromotionServices();
+
+    final promotion = await promotionServices.get(promotionId);
+
+    if (promotion == null) {
+      log('PromotionServices.calPromotionDiscount promotion == null');
+      return 0;
+    }
+
+    double discount = 0;
+    double discountByPercentage = subTotal * promotion.discountPercentage / 100;
+
+    if (promotion.discountAmount == 0) {
+      discount = discountByPercentage;
+    } else {
+      discount = math.min(subTotal * promotion.discountPercentage / 100,
+          promotion.discountAmount);
+    }
+
+    discount = _roundDouble(discount, 1);
+
+    return discount;
+  }
+
+  double _roundDouble(double number, int fractionDigits) {
+    return double.parse(number.toStringAsFixed(fractionDigits));
   }
 }

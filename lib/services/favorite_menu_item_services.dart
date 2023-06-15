@@ -2,16 +2,22 @@ import 'dart:developer';
 
 import 'package:foodtogo_customers/models/menu_item.dart';
 import 'package:foodtogo_customers/services/menu_item_services.dart';
+import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
 
 class FavoriteMenuItemServices {
   static const kFavoriteMenuItemTbName = 'favorite_menu_item';
+  static Database? db;
 
   Future<List<MenuItem>> getAllFavoriteMenuItems() async {
-    final db = await _getFavoriteMenuItemDatabase();
-    final table = await db.query(kFavoriteMenuItemTbName);
+    db ??= await _getFavoriteMenuItemDatabase();
+    final table = await db!.query(
+      kFavoriteMenuItemTbName,
+      where: 'userId = ?',
+      whereArgs: [UserServices.userId],
+    );
 
     List<MenuItem> menuItemList = [];
     final menuItemServices = MenuItemServices();
@@ -33,9 +39,10 @@ class FavoriteMenuItemServices {
 
   Future<bool> addFavoriteMenuItem(int menuItemId) async {
     try {
-      final db = await _getFavoriteMenuItemDatabase();
+      db ??= await _getFavoriteMenuItemDatabase();
 
-      db.insert(kFavoriteMenuItemTbName, {
+      db!.insert(kFavoriteMenuItemTbName, {
+        'userId': UserServices.userId,
         'menuItemId': menuItemId,
       });
     } catch (e) {
@@ -48,9 +55,14 @@ class FavoriteMenuItemServices {
 
   Future<bool> removeFavoriteMenuItem(int menuItemId) async {
     try {
-      final db = await _getFavoriteMenuItemDatabase();
-      int rowCount = await db.delete(kFavoriteMenuItemTbName,
-          where: 'menuItemId = ?', whereArgs: [menuItemId]);
+      db ??= await _getFavoriteMenuItemDatabase();
+
+      int rowCount = await db!.delete(
+        kFavoriteMenuItemTbName,
+        where: 'userId = ? AND menuItemId = ?',
+        whereArgs: [UserServices.userId, menuItemId],
+      );
+
       log('removeFavoriteMenuItem affects $rowCount row(s).');
     } catch (e) {
       log('removeFavoriteMenuItem $e');
@@ -60,10 +72,13 @@ class FavoriteMenuItemServices {
   }
 
   Future<bool> containsMenuItemId(int menuItemId) async {
-    final db = await _getFavoriteMenuItemDatabase();
-    final result = await db.query(kFavoriteMenuItemTbName,
-        where: 'menuItemId = ?', whereArgs: [menuItemId]);
-        
+    db ??= await _getFavoriteMenuItemDatabase();
+    final result = await db!.query(
+      kFavoriteMenuItemTbName,
+      where: 'userId = ? AND menuItemId = ?',
+      whereArgs: [UserServices.userId, menuItemId],
+    );
+
     return result.isNotEmpty;
   }
 
@@ -73,10 +88,14 @@ class FavoriteMenuItemServices {
       path.join(dbPath, '$kFavoriteMenuItemTbName.db'),
       onCreate: (db, version) {
         return db.execute(
-            'CREATE TABLE $kFavoriteMenuItemTbName(menuItemId INTEGER PRIMARY KEY)');
+            'CREATE TABLE $kFavoriteMenuItemTbName(userId INTEGER, menuItemId INTEGER, PRIMARY KEY(userId, menuItemId))');
       },
       version: 1,
     );
     return db;
+  }
+
+  closeDb() async {
+    await db?.close();
   }
 }
