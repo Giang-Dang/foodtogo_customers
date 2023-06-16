@@ -27,7 +27,7 @@ class UserServices {
   static double currentLongitude = 0.0;
   static double currentLatitude = 0.0;
 
-  Future<UserDTO?> get(int userId) async {
+  Future<UserDTO?> getDTO(int userId) async {
     const apiUrl = 'api/UserAPI';
     final url = Uri.http(Secrets.kFoodToGoAPILink, apiUrl, {
       'id': userId.toString(),

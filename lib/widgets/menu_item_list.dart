@@ -7,9 +7,14 @@ class MenuItemList extends StatefulWidget {
   const MenuItemList({
     Key? key,
     required this.menuItemList,
+    this.addToCart,
+    this.removeFromCart,
   }) : super(key: key);
 
+  final Function(GlobalKey widgetKey, MenuItem menuItem)? addToCart;
+  final Function(MenuItem menuItem)? removeFromCart;
   final List<MenuItem> menuItemList;
+
   @override
   State<MenuItemList> createState() => _MenuItemListState();
 }
@@ -25,6 +30,8 @@ class _MenuItemListState extends State<MenuItemList> {
         itemCount: menuItemList.length,
         itemBuilder: (context, index) => MenuItemListItem(
           menuItem: menuItemList[index],
+          addToCart: widget.addToCart,
+          removeFromCart: widget.removeFromCart,
         ),
       ),
     );

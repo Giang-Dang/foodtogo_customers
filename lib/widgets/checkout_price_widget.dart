@@ -5,7 +5,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/models/menu_item.dart';
 import 'package:foodtogo_customers/models/merchant.dart';
-import 'package:foodtogo_customers/models/promotion.dart';
 import 'package:foodtogo_customers/services/cart_services.dart';
 import 'package:foodtogo_customers/services/fee_services.dart';
 import 'package:foodtogo_customers/services/merchant_services.dart';
@@ -13,21 +12,25 @@ import 'package:foodtogo_customers/services/promotion_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 
-class PriceWidget extends StatefulWidget {
-  PriceWidget({
+class CheckoutPriceWidget extends StatefulWidget {
+  const CheckoutPriceWidget({
     Key? key,
     required this.merchant,
-    this.selectedPromotionId,
+    required this.selectedPromotionId,
+    required this.deliveryLongitude,
+    required this.deliveryLatitude,
   }) : super(key: key);
 
   final Merchant merchant;
-  int? selectedPromotionId;
+  final int selectedPromotionId;
+  final double deliveryLongitude;
+  final double deliveryLatitude;
 
   @override
-  State<PriceWidget> createState() => _PriceWidgetState();
+  State<CheckoutPriceWidget> createState() => _CheckoutPriceWidgetState();
 }
 
-class _PriceWidgetState extends State<PriceWidget> {
+class _CheckoutPriceWidgetState extends State<CheckoutPriceWidget> {
   double _subTotal = 0;
   double _shippingFee = 0;
   double _appFee = 0;
@@ -35,6 +38,10 @@ class _PriceWidgetState extends State<PriceWidget> {
   double _promotionDiscount = 0;
   double _distance = 0;
   int _totalQuantity = 0;
+
+  int _oldPromotionId = 0;
+  double _oldDeliveryLongitude = UserServices.currentLongitude;
+  double _oldDeliveryLatitude = UserServices.currentLatitude;
 
   Timer? _initTimer;
 
@@ -71,7 +78,10 @@ class _PriceWidgetState extends State<PriceWidget> {
     return totalQuantity;
   }
 
-  double _calDistance(Merchant merchant) {
+  double _calDistance(
+      {required Merchant merchant,
+      required double startLongitude,
+      required double startLatitude}) {
     final merchantServices = MerchantServices();
     final distance = merchantServices.calDistance(
       merchant: merchant,
@@ -102,42 +112,75 @@ class _PriceWidgetState extends State<PriceWidget> {
     return double.parse(number.toStringAsFixed(fractionDigits));
   }
 
-  _initialize(Merchant merchant, int? promotionId) async {
+  _calPrices(
+      {required Merchant merchant,
+      required int promotionId,
+      required double startLongitude,
+      required double startLatitude}) async {
     final feeServices = FeeServices();
 
     double subTotal = await _calSubTotal(merchant);
 
     double appFee = feeServices.calAppFee(subTotal);
 
-    double distance = _calDistance(merchant);
+    double distance = _calDistance(
+      merchant: merchant,
+      startLatitude: startLatitude,
+      startLongitude: startLongitude,
+    );
     distance = _roundDouble(distance, 1);
 
     double shippingFee = await _calShippingFee(merchant, distance);
-
-    double promotionDiscount = 0;
-    if (promotionId != null) {
-      promotionDiscount = await _calPromotionDiscount(promotionId, subTotal);
-      promotionDiscount = _roundDouble(promotionDiscount, 1);
-    }
 
     subTotal = _roundDouble(subTotal, 1);
     appFee = _roundDouble(appFee, 1);
     shippingFee = _roundDouble(shippingFee, 1);
 
-    double total = subTotal + appFee + shippingFee - promotionDiscount;
+    double total = subTotal + appFee + shippingFee;
     total = _roundDouble(total, 1);
 
     final totalQuantity = await _calTotalQuantity(merchant);
+
+    _updatePromotionDiscount(
+        promotionId: promotionId,
+        subTotal: subTotal,
+        appFee: appFee,
+        shippingFee: shippingFee);
 
     if (mounted) {
       setState(() {
         _subTotal = subTotal;
         _appFee = appFee;
         _shippingFee = shippingFee;
-        _promotionDiscount = promotionDiscount;
         _total = total;
         _totalQuantity = totalQuantity;
         _distance = distance;
+      });
+    }
+  }
+
+  _updatePromotionDiscount({
+    required int promotionId,
+    required double subTotal,
+    required double appFee,
+    required double shippingFee,
+  }) async {
+    double promotionDiscount = 0;
+    if (promotionId != 0) {
+      promotionDiscount = await _calPromotionDiscount(promotionId, subTotal);
+      promotionDiscount = _roundDouble(promotionDiscount, 1);
+    }
+
+    final total = subTotal + appFee + shippingFee - promotionDiscount;
+
+    if (total == _total) {
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _total = total;
+        _promotionDiscount = promotionDiscount;
       });
     }
   }
@@ -148,7 +191,12 @@ class _PriceWidgetState extends State<PriceWidget> {
     super.initState();
 
     _initTimer = Timer.periodic(const Duration(microseconds: 100), (timer) {
-      // _initialize(widget.merchant, widget.selectedPromotionId);
+      _calPrices(
+        merchant: widget.merchant,
+        promotionId: widget.selectedPromotionId,
+        startLatitude: widget.deliveryLatitude,
+        startLongitude: widget.deliveryLongitude,
+      );
       _initTimer?.cancel();
     });
   }
@@ -162,7 +210,21 @@ class _PriceWidgetState extends State<PriceWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _initialize(widget.merchant, widget.selectedPromotionId);
+    // _initialize(widget.merchant, widget.selectedPromotionId);
+
+    if (_oldPromotionId != widget.selectedPromotionId ||
+        _oldDeliveryLatitude != widget.deliveryLatitude ||
+        _oldDeliveryLongitude != widget.deliveryLongitude) {
+      _calPrices(
+        merchant: widget.merchant,
+        promotionId: widget.selectedPromotionId,
+        startLongitude: widget.deliveryLongitude,
+        startLatitude: widget.deliveryLatitude,
+      );
+      _oldPromotionId = widget.selectedPromotionId;
+      _oldDeliveryLatitude = widget.deliveryLatitude;
+      _oldDeliveryLongitude = widget.deliveryLongitude;
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -183,7 +245,7 @@ class _PriceWidgetState extends State<PriceWidget> {
             child: ListTile(
               title: Text('Subtotal ($_totalQuantity item(s) ): '),
               trailing: Text(
-                '\$$_subTotal',
+                '\$${_subTotal.toStringAsFixed(1)}',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: KColors.kTextColor,
                       fontSize: 14,
@@ -196,7 +258,7 @@ class _PriceWidgetState extends State<PriceWidget> {
             child: ListTile(
               title: Text('Shipping Fee ($_distance km): '),
               trailing: Text(
-                '\$$_shippingFee',
+                '\$${_shippingFee.toStringAsFixed(1)}',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: KColors.kTextColor,
                       fontSize: 14,
@@ -209,7 +271,7 @@ class _PriceWidgetState extends State<PriceWidget> {
             child: ListTile(
               title: Text('Application Fee: '),
               trailing: Text(
-                '\$$_appFee',
+                '\$${_appFee.toStringAsFixed(1)}',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: KColors.kTextColor,
                       fontSize: 14,
@@ -222,10 +284,11 @@ class _PriceWidgetState extends State<PriceWidget> {
             child: ListTile(
               title: Text('Promotion: '),
               trailing: Text(
-                '- \$$_promotionDiscount',
+                '- \$${_promotionDiscount.toStringAsFixed(1)}',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: KColors.kTextColor,
-                      fontSize: 14,
+                      color: KColors.kSuccessColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
               ),
             ),
@@ -235,10 +298,10 @@ class _PriceWidgetState extends State<PriceWidget> {
             child: ListTile(
               title: Text('Total: '),
               trailing: Text(
-                '\$$_total',
+                '\$${_total.toStringAsFixed(1)}',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: KColors.kPrimaryColor,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
               ),

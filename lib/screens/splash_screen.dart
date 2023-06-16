@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/models/dto/create_dto/online_customer_location_create_dto.dart';
+import 'package:foodtogo_customers/models/dto/update_dto/online_customer_location_update_dto.dart';
 import 'package:foodtogo_customers/models/online_customer_location.dart';
 import 'package:foodtogo_customers/screens/login_screen.dart';
 import 'package:foodtogo_customers/screens/tabs_screen.dart';
@@ -44,8 +45,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       );
 
       final onlineCustomerLocationSevices = OnlineCustomerLocationServices();
-      onlineCustomerLocationSevices.create(onlineCustomerLocationCreateDTO);
+      final createResult = await onlineCustomerLocationSevices
+          .create(onlineCustomerLocationCreateDTO);
 
+      if (!createResult) {
+        final onlineCustomerLocationUpdateDTO = OnlineCustomerLocationUpdateDTO(
+          customerId: UserServices.userId!,
+          geoLatitude: UserServices.currentLatitude,
+          geoLongitude: UserServices.currentLongitude,
+        );
+        final updateResult = await onlineCustomerLocationSevices.update(
+            UserServices.userId!, onlineCustomerLocationUpdateDTO);
+      }
       //route
       if (context.mounted) {
         Navigator.pushReplacement(
@@ -102,9 +113,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('FoodToGo - Customers'),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

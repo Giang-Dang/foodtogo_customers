@@ -5,6 +5,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/models/menu_item.dart';
 import 'package:foodtogo_customers/providers/favorite_menu_item_list_provider.dart';
+import 'package:foodtogo_customers/services/cart_services.dart';
 import 'package:foodtogo_customers/services/favorite_menu_item_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
@@ -16,10 +17,12 @@ class MenuItemListItem extends ConsumerStatefulWidget {
     Key? key,
     required this.menuItem,
     this.addToCart,
+    this.removeFromCart,
   }) : super(key: key);
 
   final MenuItem menuItem;
   final Function(GlobalKey widgetKey, MenuItem menuItem)? addToCart;
+  final Function(MenuItem menuItem)? removeFromCart;
 
   @override
   ConsumerState<MenuItemListItem> createState() => _MenuItemListItemState();
@@ -28,18 +31,26 @@ class MenuItemListItem extends ConsumerStatefulWidget {
 class _MenuItemListItemState extends ConsumerState<MenuItemListItem> {
   final GlobalKey itemAddToCartKey = GlobalKey();
 
+  int _quantity = 0;
   bool _isFavorite = false;
 
   Timer? _initTimer;
 
   _initial(int menuItemId) async {
     final favoriteMenuItemServices = FavoriteMenuItemServices();
-    final isFavorite =
-        await favoriteMenuItemServices.containsMenuItemId(menuItemId);
+    final cartServices = CartServices();
 
+    final results = await Future.wait([
+      favoriteMenuItemServices.containsMenuItemId(menuItemId),
+      cartServices.getQuantity(menuItemId)
+    ]);
+
+    final isFavorite = results[0] as bool;
+    final quantity = results[1] as int;
 
     if (mounted) {
       setState(() {
+        _quantity = quantity;
         _isFavorite = isFavorite;
       });
     }
@@ -59,7 +70,6 @@ class _MenuItemListItemState extends ConsumerState<MenuItemListItem> {
     final menuItemList =
         await favoriteMenuItemServices.getAllFavoriteMenuItems();
     ref.watch(favoriteMenuItemListProvider.notifier).update(menuItemList);
-
   }
 
   _getFavoriteStatus(int menuItemId) async {
@@ -67,10 +77,17 @@ class _MenuItemListItemState extends ConsumerState<MenuItemListItem> {
     final isFavorite =
         await favoriteMenuItemServices.containsMenuItemId(menuItemId);
 
-
     if (mounted) {
       setState(() {
         _isFavorite = isFavorite;
+      });
+    }
+  }
+
+  _setQuantity(int quantity) async {
+    if (mounted) {
+      setState(() {
+        _quantity = quantity;
       });
     }
   }
@@ -109,7 +126,7 @@ class _MenuItemListItemState extends ConsumerState<MenuItemListItem> {
         onTap: () {},
         child: Container(
           width: deviceWidth - 20,
-          height: 120,
+          height: 145,
           decoration: BoxDecoration(
             color: KColors.kOnBackgroundColor,
             borderRadius: BorderRadius.circular(10),
@@ -137,7 +154,7 @@ class _MenuItemListItemState extends ConsumerState<MenuItemListItem> {
                         'Authorization': 'Bearer $jwtToken',
                       },
                     ),
-                    height: 100,
+                    height: 120,
                     width: 120,
                     fit: BoxFit.cover,
                   ),
@@ -150,12 +167,29 @@ class _MenuItemListItemState extends ConsumerState<MenuItemListItem> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     const SizedBox(width: 10),
-                    Text(
-                      menuItem.name,
-                      style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: KColors.kPrimaryColor),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          menuItem.name,
+                          style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: KColors.kPrimaryColor),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            _onFavoriteTab(menuItem.id);
+                          },
+                          icon: Icon(
+                            _isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: KColors.kPrimaryColor,
+                            size: 26,
+                          ),
+                        ),
+                      ],
                     ),
                     Text(
                       '${menuItem.description}\n',
@@ -184,13 +218,67 @@ class _MenuItemListItemState extends ConsumerState<MenuItemListItem> {
                         )
                       ],
                     ),
-                    Text(
-                      '\$${menuItem.unitPrice.toStringAsFixed(1)}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: KColors.kPrimaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '\$${menuItem.unitPrice.toStringAsFixed(1)}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: KColors.kPrimaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                if (_quantity == 0) {
+                                  return;
+                                }
+                                if (widget.addToCart != null) {
+                                  widget.removeFromCart!(menuItem);
+                                  _setQuantity(_quantity - 1);
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.remove,
+                                color: KColors.kPrimaryColor,
+                                size: 26,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.fromLTRB(5, 3, 5, 3),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(3.0),
+                                border:
+                                    Border.all(color: KColors.kPrimaryColor),
+                              ),
+                              child: Text(
+                                _quantity.toString(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(fontSize: 14),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                if (widget.addToCart != null) {
+                                  widget.addToCart!(itemAddToCartKey, menuItem);
+                                  _setQuantity(_quantity + 1);
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.add,
+                                color: KColors.kPrimaryColor,
+                                size: 26,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                     const SizedBox(
                       height: 2,
@@ -200,31 +288,8 @@ class _MenuItemListItemState extends ConsumerState<MenuItemListItem> {
               ),
               Column(
                 mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      _onFavoriteTab(menuItem.id);
-                    },
-                    icon: Icon(
-                      _isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: KColors.kPrimaryColor,
-                      size: 26,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      if (widget.addToCart != null) {
-                        widget.addToCart!(itemAddToCartKey, menuItem);
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.add,
-                      color: KColors.kPrimaryColor,
-                      size: 26,
-                    ),
-                  ),
-                ],
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [],
               ),
             ],
           ),

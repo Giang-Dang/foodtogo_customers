@@ -90,6 +90,7 @@ class CartServices {
 
     final row = table[0];
     final quantity = row['quantity'] as int?;
+
     if (quantity == null) {
       log('getQuantity() quantity == null');
       return 0;
@@ -98,11 +99,17 @@ class CartServices {
     return quantity;
   }
 
-  Future<int> getTotalQuantity() async {
+  Future<int> getTotalQuantity({int? merchantId}) async {
     db ??= await _getCartDatabase();
-    final result = await db!.rawQuery(
-        'SELECT SUM(quantity) as totalQuantity FROM $kCardDbName WHERE userId = ?',
-        [UserServices.userId]);
+    String query =
+        'SELECT SUM(quantity) as totalQuantity FROM $kCardDbName WHERE userId = ?';
+    List<Object?> whereArgs = [UserServices.userId];
+
+    if (merchantId != null) {
+      query = '$query AND merchantId = ?';
+      whereArgs.add(merchantId);
+    }
+    final result = await db!.rawQuery(query, whereArgs);
 
     int totalQuantity =
         int.tryParse(result[0]['totalQuantity'].toString()) ?? 0;
@@ -114,6 +121,9 @@ class CartServices {
     try {
       final isMenuItemExists = await containsMenuItem(menuItem);
       if (isMenuItemExists) {
+        if (quantity == 0) {
+          delete(menuItem);
+        }
         update(menuItem, quantity);
       } else {
         insert(menuItem, quantity);

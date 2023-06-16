@@ -13,7 +13,11 @@ import 'package:foodtogo_customers/widgets/menu_item_list.dart';
 import 'package:foodtogo_customers/widgets/merchant_list.dart';
 
 class FavoriteWidget extends ConsumerStatefulWidget {
-  const FavoriteWidget({Key? key}) : super(key: key);
+  FavoriteWidget({Key? key, this.addToCart, this.removeFromCart})
+      : super(key: key);
+
+  final Function(GlobalKey widgetKey, MenuItem menuItem)? addToCart;
+  final Function(MenuItem menuItem)? removeFromCart;
 
   @override
   ConsumerState<FavoriteWidget> createState() => _FavoriteWidgetState();
@@ -133,7 +137,11 @@ class _FavoriteWidgetState extends ConsumerState<FavoriteWidget>
               controller: _tabController,
               children: [
                 MerchantList(merchantList: _merchantList),
-                MenuItemList(menuItemList: _menuItemList),
+                MenuItemList(
+                  menuItemList: _menuItemList,
+                  addToCart: widget.addToCart,
+                  removeFromCart: widget.removeFromCart,
+                ),
               ],
             ),
           ),

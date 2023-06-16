@@ -8,10 +8,12 @@ class MerchantMenuItemList extends StatefulWidget {
     Key? key,
     required this.menuItemList,
     this.addToCart,
+    this.removeFromCart,
   }) : super(key: key);
 
   final List<MenuItem> menuItemList;
   final Function(GlobalKey widgetKey, MenuItem menuItem)? addToCart;
+  final Function(MenuItem menuItem)? removeFromCart;
 
   @override
   State<MerchantMenuItemList> createState() => _MerchantMenuItemListState();
@@ -30,6 +32,7 @@ class _MerchantMenuItemListState extends State<MerchantMenuItemList> {
               MenuItemListItem(
                 menuItem: menuItem,
                 addToCart: widget.addToCart,
+                removeFromCart: widget.removeFromCart,
               ),
           ],
         ));

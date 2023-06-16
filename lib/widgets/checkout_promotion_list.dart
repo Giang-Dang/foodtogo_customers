@@ -41,7 +41,6 @@ class _CheckoutPromotionListState extends State<CheckoutPromotionList> {
 
     if (mounted) {
       setState(() {
-        _selectedPromotionId = promotionList[0].id;
         _promotionList = promotionList;
       });
     }
@@ -89,11 +88,12 @@ class _CheckoutPromotionListState extends State<CheckoutPromotionList> {
               Container(
                 color: KColors.kOnBackgroundColor,
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(5, 5, 0, 0),
+                padding: const EdgeInsets.fromLTRB(8, 10, 0, 0),
                 child: Text(
                   'Promotions:',
-                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: KColors.kTextColor,
+                        fontSize: 18,
                       ),
                 ),
               ),
@@ -101,7 +101,13 @@ class _CheckoutPromotionListState extends State<CheckoutPromotionList> {
                 Container(
                   color: KColors.kOnBackgroundColor,
                   child: RadioListTile(
-                    title: Text(promotion.name),
+                    title: Text(
+                      promotion.name,
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: KColors.kTextColor,
+                            fontSize: 16,
+                          ),
+                    ),
                     value: promotion.id,
                     groupValue: _selectedPromotionId,
                     onChanged: (value) {

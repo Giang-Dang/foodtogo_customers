@@ -75,9 +75,10 @@ class OnlineCustomerLocationServices {
     return true;
   }
 
-  Future<bool> update(OnlineCustomerLocationUpdateDTO updateDTO) async {
+  Future<bool> update(int id, OnlineCustomerLocationUpdateDTO updateDTO) async {
+    final newAPIUrl = '$_apiUrl/$id';
     final jwtToken = UserServices.jwtToken;
-    final url = Uri.http(Secrets.kFoodToGoAPILink, _apiUrl);
+    final url = Uri.http(Secrets.kFoodToGoAPILink, newAPIUrl);
 
     final jsonData = json.encode(updateDTO.toJson());
 

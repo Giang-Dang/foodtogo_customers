@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:add_to_cart_animation/add_to_cart_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:foodtogo_customers/models/menu_item.dart';
 import 'package:foodtogo_customers/screens/cart_screen.dart';
 import 'package:foodtogo_customers/services/cart_services.dart';
 import 'package:foodtogo_customers/services/online_customer_location_services.dart';
@@ -34,6 +36,31 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
 
   Timer? _initTimer;
 
+  removeFromCart(MenuItem menuItem) async {
+    final cartServices = CartServices();
+    int quantity = await cartServices.getQuantity(menuItem.id);
+    if (quantity == 0) {
+      return;
+    }
+    bool isRemovingSuccess =
+        await cartServices.addMenuItem(menuItem, quantity - 1);
+
+    if (isRemovingSuccess) {
+      _getTotalItemQuantityInCart();
+    }
+  }
+
+  addToCart(GlobalKey widgetKey, MenuItem menuItem) async {
+    final cartServices = CartServices();
+    int quantity = await cartServices.getQuantity(menuItem.id);
+    bool isAddingSuccess =
+        await cartServices.addMenuItem(menuItem, quantity + 1);
+
+    if (isAddingSuccess) {
+      _getTotalItemQuantityInCart();
+    }
+  }
+
   _deleteLocation() async {
     final onlineCustomerLocationServices = OnlineCustomerLocationServices();
     int userId = UserServices.userId ?? 0;
@@ -56,7 +83,10 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
           _isAppBarShow = true;
           _isFloatingButtonShow = false;
         } else if (_selectedPageIndex == TabName.favorites.index) {
-          _activePage = const FavoriteWidget();
+          _activePage = FavoriteWidget(
+            addToCart: addToCart,
+            removeFromCart: removeFromCart,
+          );
           _isAppBarShow = false;
           _isFloatingButtonShow = true;
         } else if (_selectedPageIndex == TabName.me.index) {
@@ -76,7 +106,6 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
     final cartServices = CartServices();
 
     final totalQuantity = await cartServices.getTotalQuantity();
-
 
     if (mounted) {
       setState(() {

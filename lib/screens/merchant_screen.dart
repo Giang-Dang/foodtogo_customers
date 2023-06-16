@@ -8,6 +8,7 @@ import 'package:foodtogo_customers/models/menu_item.dart';
 import 'package:foodtogo_customers/models/merchant.dart';
 import 'package:foodtogo_customers/providers/favorite_merchant_list_provider.dart';
 import 'package:foodtogo_customers/screens/cart_screen.dart';
+import 'package:foodtogo_customers/screens/checkout_screen.dart';
 import 'package:foodtogo_customers/services/cart_services.dart';
 import 'package:foodtogo_customers/services/delivery_services.dart';
 import 'package:foodtogo_customers/services/favorite_merchant_services.dart';
@@ -69,7 +70,6 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
     final merchantList = await favoriteMerchantServices.getAllMerchants();
     ref.watch(favoriteMerchantListProvider.notifier).update(merchantList);
 
-
     if (mounted) {
       setState(() {
         _isFavorite = isFavorite;
@@ -97,12 +97,26 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
     }
   }
 
+  removeFromCart(MenuItem menuItem) async {
+    final cartServices = CartServices();
+    int quantity = await cartServices.getQuantity(menuItem.id);
+    if (quantity == 0) {
+      return;
+    }
+    bool isRemovingSuccess =
+        await cartServices.addMenuItem(menuItem, quantity - 1);
+
+    if (isRemovingSuccess) {
+      await cartKey.currentState!
+          .updateBadge((--_cartQuantityItems).toString());
+    }
+  }
+
   addToCart(GlobalKey widgetKey, MenuItem menuItem) async {
     final cartServices = CartServices();
     int quantity = await cartServices.getQuantity(menuItem.id);
     bool isAddingSuccess =
         await cartServices.addMenuItem(menuItem, quantity + 1);
-
 
     if (isAddingSuccess) {
       //animation
@@ -112,13 +126,13 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
     }
   }
 
-  _setCartQuantity() async {
+  _setCartQuantity(int merchantId) async {
     final cartServices = CartServices();
-    int totalQuantity = await cartServices.getTotalQuantity();
+    int totalQuantity =
+        await cartServices.getTotalQuantity(merchantId: merchantId);
     if (cartKey.currentState != null) {
       await cartKey.currentState!.updateBadge(totalQuantity.toString());
     }
-
   }
 
   _initial(int merchantId) {
@@ -127,8 +141,10 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
 
   _onFloatingActionButtonPressed() {
     if (context.mounted) {
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => const CartScreen()));
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => CheckoutScreen(
+                merchant: widget.merchant,
+              )));
     }
   }
 
@@ -168,7 +184,7 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
     final double deviceWidth = MediaQuery.of(context).size.width;
 
     _getFavoriteStatus(merchant.merchantId);
-    _setCartQuantity();
+    _setCartQuantity(merchant.merchantId);
 
     Widget menuItemListContent = const Center(
       child: CircularProgressIndicator(),
@@ -178,6 +194,7 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
       menuItemListContent = MerchantMenuItemList(
         menuItemList: _menuItemList,
         addToCart: addToCart,
+        removeFromCart: removeFromCart,
       );
     }
 
@@ -336,11 +353,11 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
               ),
             ),
             Positioned(
-              top: 20,
+              top: 40,
               left: 10,
               child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.1),
+                decoration: const BoxDecoration(
+                  color: KColors.kPrimaryColor,
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -349,7 +366,10 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
                       Navigator.of(context).pop();
                     }
                   },
-                  icon: const Icon(Icons.arrow_back),
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: KColors.kOnBackgroundColor,
+                  ),
                 ),
               ),
             ),
