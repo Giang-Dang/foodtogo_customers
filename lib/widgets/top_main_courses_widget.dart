@@ -79,7 +79,7 @@ class _TopMainCoursesWidgetState extends State<TopMainCoursesWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget merchantListcontain = const Center(
+    Widget menuItemListContent = const Center(
       child: Column(
         children: [
           SizedBox(height: 50),
@@ -88,7 +88,7 @@ class _TopMainCoursesWidgetState extends State<TopMainCoursesWidget> {
       ),
     );
     if (!_isLoading) {
-      merchantListcontain = Row(
+      menuItemListContent = Row(
         children: [
           MenuItemCardList(menuItemList: _menuItemList),
         ],
@@ -109,7 +109,7 @@ class _TopMainCoursesWidgetState extends State<TopMainCoursesWidget> {
             textAlign: TextAlign.start,
           ),
         ),
-        merchantListcontain,
+        menuItemListContent,
       ],
     );
   }

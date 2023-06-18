@@ -77,7 +77,7 @@ class _TopSnacksWidgetState extends State<TopSnacksWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget merchantListcontain = const Center(
+    Widget menuItemListContent = const Center(
       child: Column(
         children: [
           SizedBox(height: 50),
@@ -86,7 +86,7 @@ class _TopSnacksWidgetState extends State<TopSnacksWidget> {
       ),
     );
     if (!_isLoading) {
-      merchantListcontain = Row(
+      menuItemListContent = Row(
         children: [
           MenuItemCardList(menuItemList: _menuItemList),
         ],
@@ -107,7 +107,7 @@ class _TopSnacksWidgetState extends State<TopSnacksWidget> {
             textAlign: TextAlign.start,
           ),
         ),
-        merchantListcontain,
+        menuItemListContent,
       ],
     );
   }

@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/models/menu_item.dart';
+import 'package:foodtogo_customers/models/merchant.dart';
 import 'package:foodtogo_customers/providers/favorite_menu_item_list_provider.dart';
+import 'package:foodtogo_customers/screens/merchant_screen.dart';
 import 'package:foodtogo_customers/services/favorite_menu_item_services.dart';
+import 'package:foodtogo_customers/services/merchant_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/settings/secrets.dart';
@@ -27,6 +31,7 @@ class MenuItemCardListItem extends ConsumerStatefulWidget {
 
 class _MenuItemCardListItemState extends ConsumerState<MenuItemCardListItem> {
   bool _isFavorite = false;
+  late Merchant _merchant;
   Timer? _initTimer;
 
   _initial(int menuItemId) async {
@@ -34,10 +39,18 @@ class _MenuItemCardListItemState extends ConsumerState<MenuItemCardListItem> {
     final isFavorite =
         await favoriteMenuItemServices.containsMenuItemId(menuItemId);
 
+    final merchantServices = MerchantServices();
+    final merchant = await merchantServices.get(widget.menuItem.merchantId);
+
+    if (merchant == null) {
+      log('_MenuItemCardListItemState._initial() merchant == null');
+      return;
+    }
 
     if (mounted) {
       setState(() {
         _isFavorite = isFavorite;
+        _merchant = merchant;
       });
     }
   }
@@ -49,7 +62,6 @@ class _MenuItemCardListItemState extends ConsumerState<MenuItemCardListItem> {
 
     if (isFavorite) {
       favoriteMenuItemServices.addFavoriteMenuItem(menuItemId);
-      
     } else {
       favoriteMenuItemServices.removeFavoriteMenuItem(menuItemId);
     }
@@ -57,7 +69,6 @@ class _MenuItemCardListItemState extends ConsumerState<MenuItemCardListItem> {
     final menuItemList =
         await favoriteMenuItemServices.getAllFavoriteMenuItems();
     ref.watch(favoriteMenuItemListProvider.notifier).update(menuItemList);
-
 
     if (mounted) {
       setState(() {
@@ -115,7 +126,16 @@ class _MenuItemCardListItemState extends ConsumerState<MenuItemCardListItem> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                if (context.mounted) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            MerchantScreen(merchant: _merchant),
+                      ));
+                }
+              },
               child: Container(
                 width: containerWidth,
                 height: containerHeight,
