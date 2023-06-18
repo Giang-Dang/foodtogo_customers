@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/models/dto/create_dto/online_customer_location_create_dto.dart';
 import 'package:foodtogo_customers/models/dto/login_request_dto.dart';
+import 'package:foodtogo_customers/models/dto/update_dto/online_customer_location_update_dto.dart';
 import 'package:foodtogo_customers/models/enum/login_from_app.dart';
+import 'package:foodtogo_customers/screens/customer_register_screen.dart';
 import 'package:foodtogo_customers/screens/tabs_screen.dart';
 import 'package:foodtogo_customers/screens/user_register_screen.dart';
+import 'package:foodtogo_customers/services/customer_services.dart';
 import 'package:foodtogo_customers/services/online_customer_location_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
@@ -56,7 +59,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
 
         final onlineCustomerLocationSevices = OnlineCustomerLocationServices();
-        onlineCustomerLocationSevices.create(onlineCustomerLocationCreateDTO);
+        final createResult = await onlineCustomerLocationSevices
+            .create(onlineCustomerLocationCreateDTO);
+
+        if (!createResult) {
+          final onlineCustomerLocationUpdateDTO =
+              OnlineCustomerLocationUpdateDTO(
+            customerId: UserServices.userId!,
+            geoLatitude: UserServices.currentLatitude,
+            geoLongitude: UserServices.currentLongitude,
+          );
+          final updateResult = await onlineCustomerLocationSevices.update(
+              UserServices.userId!, onlineCustomerLocationUpdateDTO);
+        }
+      }
+
+      final customerServices = CustomerServices();
+      final customerQueryResult =
+          await customerServices.getDTO(UserServices.userId!);
+
+      if (customerQueryResult == null) {
+        if (context.mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  CustomerRegisterScreen(userId: UserServices.userId!),
+            ),
+          );
+        }
+        return;
       }
 
       if (mounted) {

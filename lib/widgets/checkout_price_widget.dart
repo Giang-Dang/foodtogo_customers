@@ -19,12 +19,23 @@ class CheckoutPriceWidget extends StatefulWidget {
     required this.selectedPromotionId,
     required this.deliveryLongitude,
     required this.deliveryLatitude,
+    required this.setPrice,
+    required this.calETA,
   }) : super(key: key);
 
   final Merchant merchant;
   final int selectedPromotionId;
   final double deliveryLongitude;
   final double deliveryLatitude;
+  final Function({
+    required double orderPrice,
+    required double shippingFee,
+    required double appFee,
+    required double promotionDiscount,
+  }) setPrice;
+  final Function({
+    required double distance,
+  }) calETA;
 
   @override
   State<CheckoutPriceWidget> createState() => _CheckoutPriceWidgetState();
@@ -132,20 +143,29 @@ class _CheckoutPriceWidgetState extends State<CheckoutPriceWidget> {
 
     double shippingFee = await _calShippingFee(merchant, distance);
 
-    subTotal = _roundDouble(subTotal, 1);
-    appFee = _roundDouble(appFee, 1);
-    shippingFee = _roundDouble(shippingFee, 1);
-
-    double total = subTotal + appFee + shippingFee;
-    total = _roundDouble(total, 1);
-
-    final totalQuantity = await _calTotalQuantity(merchant);
-
-    _updatePromotionDiscount(
+    double promotionDiscount = await _updatePromotionDiscount(
         promotionId: promotionId,
         subTotal: subTotal,
         appFee: appFee,
         shippingFee: shippingFee);
+
+    subTotal = _roundDouble(subTotal, 1);
+    appFee = _roundDouble(appFee, 1);
+    shippingFee = _roundDouble(shippingFee, 1);
+    promotionDiscount = _roundDouble(promotionDiscount, 1);
+
+    final totalQuantity = await _calTotalQuantity(merchant);
+
+    double total = subTotal + appFee + shippingFee - promotionDiscount;
+    total = _roundDouble(total, 1);
+
+    widget.setPrice(
+        appFee: appFee,
+        shippingFee: shippingFee,
+        orderPrice: subTotal,
+        promotionDiscount: promotionDiscount);
+
+    widget.calETA(distance: distance);
 
     if (mounted) {
       setState(() {
@@ -155,6 +175,7 @@ class _CheckoutPriceWidgetState extends State<CheckoutPriceWidget> {
         _total = total;
         _totalQuantity = totalQuantity;
         _distance = distance;
+        _promotionDiscount = promotionDiscount;
       });
     }
   }
@@ -171,18 +192,7 @@ class _CheckoutPriceWidgetState extends State<CheckoutPriceWidget> {
       promotionDiscount = _roundDouble(promotionDiscount, 1);
     }
 
-    final total = subTotal + appFee + shippingFee - promotionDiscount;
-
-    if (total == _total) {
-      return;
-    }
-
-    if (mounted) {
-      setState(() {
-        _total = total;
-        _promotionDiscount = promotionDiscount;
-      });
-    }
+    return promotionDiscount;
   }
 
   @override
@@ -269,7 +279,7 @@ class _CheckoutPriceWidgetState extends State<CheckoutPriceWidget> {
           Container(
             color: KColors.kOnBackgroundColor,
             child: ListTile(
-              title: Text('Application Fee: '),
+              title: const Text('Application Fee: '),
               trailing: Text(
                 '\$${_appFee.toStringAsFixed(1)}',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -282,7 +292,7 @@ class _CheckoutPriceWidgetState extends State<CheckoutPriceWidget> {
           Container(
             color: KColors.kOnBackgroundColor,
             child: ListTile(
-              title: Text('Promotion: '),
+              title: const Text('Promotion: '),
               trailing: Text(
                 '- \$${_promotionDiscount.toStringAsFixed(1)}',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -296,7 +306,7 @@ class _CheckoutPriceWidgetState extends State<CheckoutPriceWidget> {
           Container(
             color: KColors.kOnBackgroundColor,
             child: ListTile(
-              title: Text('Total: '),
+              title: const Text('Total: '),
               trailing: Text(
                 '\$${_total.toStringAsFixed(1)}',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(

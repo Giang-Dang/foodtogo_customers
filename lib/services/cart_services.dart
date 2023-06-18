@@ -44,6 +44,23 @@ class CartServices {
     return merchantList;
   }
 
+  Future<List<int>> getAllMenuItemIdByMerchantId(int merchantId) async {
+    db ??= await _getCartDatabase();
+    final table = await db!.query(
+      kCardDbName,
+      where: 'userId = ? AND merchantId = ?',
+      whereArgs: [UserServices.userId, merchantId],
+    );
+
+    List<int> menuItemIdList = [];
+    for (var row in table) {
+      var menuItemId = row['menuItemId'] as int;
+      menuItemIdList.add(menuItemId);
+    }
+
+    return menuItemIdList;
+  }
+
   Future<List<MenuItem>> getAllMenuItemsByMerchantId(int merchantId) async {
     db ??= await _getCartDatabase();
     final table = await db!.query(
@@ -122,7 +139,7 @@ class CartServices {
       final isMenuItemExists = await containsMenuItem(menuItem);
       if (isMenuItemExists) {
         if (quantity == 0) {
-          delete(menuItem);
+          delete(menuItem.id);
         }
         update(menuItem, quantity);
       } else {
@@ -188,13 +205,13 @@ class CartServices {
     return true;
   }
 
-  Future<bool> delete(MenuItem menuItem) async {
+  Future<bool> delete(int menuItemid) async {
     try {
       db ??= await _getCartDatabase();
 
       int rowCount = await db!.delete(kCardDbName,
           where: 'userId = ? AND menuItemId = ?',
-          whereArgs: [UserServices.userId, menuItem.id]);
+          whereArgs: [UserServices.userId, menuItemid]);
 
       log('CartServices.delete() affects $rowCount row(s).');
     } catch (e) {

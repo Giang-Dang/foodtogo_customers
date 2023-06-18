@@ -14,8 +14,6 @@ import 'package:foodtogo_customers/services/location_services.dart';
 import 'package:foodtogo_customers/settings/secrets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart' as syspaths;
 
 const kTokenKeyName = 'loginToken';
 const kUserIdKeyName = 'userId';
@@ -27,8 +25,56 @@ class UserServices {
   static double currentLongitude = 0.0;
   static double currentLatitude = 0.0;
 
-  Future<UserDTO?> getDTO(int userId) async {
+  Future<List<UserDTO>?> getAllDTOs({
+    String? searchUserName,
+    String? searchRole,
+    String? searchEmail,
+    String? searchPhoneNumber,
+    int? pageSize,
+    int? pageNumber,
+  }) async {
+    final jwtToken = UserServices.jwtToken;
     const apiUrl = 'api/UserAPI';
+
+    final queryParams = <String, String>{};
+    if (searchUserName != null) {
+      queryParams['searchUserName'] = searchUserName;
+    }
+    if (searchRole != null) {
+      queryParams['searchRole'] = searchRole;
+    }
+    if (searchEmail != null) {
+      queryParams['searchEmail'] = searchEmail;
+    }
+    if (searchPhoneNumber != null) {
+      queryParams['searchPhoneNumber'] = searchPhoneNumber;
+    }
+    if (pageSize != null && pageNumber != null) {
+      queryParams['pageSize'] = pageSize.toString();
+      queryParams['pageNumber'] = pageNumber.toString();
+    }
+
+    final url = Uri.http(Secrets.kFoodToGoAPILink, apiUrl, queryParams);
+
+    final responseJson = await http.get(url, headers: {
+      'Authorization': 'Bearer $jwtToken',
+    });
+
+    if (responseJson.statusCode == HttpStatus.ok) {
+      final responseData = json.decode(responseJson.body);
+
+      final ordersList = (responseData['result'] as List)
+          .map((json) => UserDTO.fromJson(json))
+          .toList();
+
+      return ordersList;
+    }
+
+    return null;
+  }
+
+  Future<UserDTO?> getDTO(int userId) async {
+    final apiUrl = 'api/UserAPI/$userId';
     final url = Uri.http(Secrets.kFoodToGoAPILink, apiUrl, {
       'id': userId.toString(),
     });
@@ -50,6 +96,26 @@ class UserServices {
 
       return userDTO;
     }
+    return null;
+  }
+
+  Future<bool?> isUsernameExist(String searchUsername) async {
+    const apiUrl = 'api/UserAPI/checkusername';
+
+    final url = Uri.http(Secrets.kFoodToGoAPILink, apiUrl, {
+      'searchUserName': searchUsername,
+    });
+
+    final responseJson = await http.get(url);
+
+    if (responseJson.statusCode == HttpStatus.ok) {
+      final responseData = json.decode(responseJson.body);
+
+      return responseData['result'] as bool;
+    }
+
+    log('isUsernameExist responseJson.statusCode != HttpStatus.ok');
+
     return null;
   }
 
@@ -179,11 +245,21 @@ class UserServices {
     );
 
     final responseObject = json.decode(responseJson.body);
+
+    if (!responseObject['isSuccess']) {
+      return APIResponseDTO(
+        statusCode: responseObject['statusCode'],
+        isSuccess: responseObject['isSuccess'],
+        errorMessages: [],
+        result: null,
+      );
+    }
+    
     return APIResponseDTO(
       statusCode: responseObject['statusCode'],
       isSuccess: responseObject['isSuccess'],
       errorMessages: [],
-      result: responseObject['result'],
+      result: responseObject['result']['id'] as int,
     );
   }
 
@@ -271,5 +347,16 @@ class UserServices {
 
     currentLatitude = locationData.latitude;
     currentLongitude = locationData.longitude;
+  }
+
+  bool isValidVietnameseName(String? name) {
+    if (name == null) {
+      return false;
+    }
+
+    final RegExp nameRegExp = RegExp(
+      r'^[a-zA-Z\u00C0-\u1EF9]+(?:\s[a-zA-Z\u00C0-\u1EF9]+)*$',
+    );
+    return nameRegExp.hasMatch(name);
   }
 }

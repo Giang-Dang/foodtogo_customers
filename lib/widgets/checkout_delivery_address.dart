@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/models/customer.dart';
 import 'package:foodtogo_customers/models/dto/user_dto.dart';
+import 'package:foodtogo_customers/models/place_location.dart';
+import 'package:foodtogo_customers/screens/map_screen.dart';
 import 'package:foodtogo_customers/services/customer_services.dart';
 import 'package:foodtogo_customers/services/location_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class CheckoutDeliveryAddress extends StatefulWidget {
   const CheckoutDeliveryAddress({
@@ -76,6 +79,31 @@ class _CheckoutDeliveryAddressState extends State<CheckoutDeliveryAddress> {
         newDeliveryAddress: _deliveryAddress ?? '',
         newDeliveryLatitude: widget.deliveryLatitude,
         newDeliveryLongitude: widget.deliveryLongitude);
+  }
+
+  void _selectOnMap() async {
+    final pickedLocation = await Navigator.of(context).push<LatLng>(
+      MaterialPageRoute(
+        builder: (ctx) => MapScreen(
+          location: PlaceLocation(
+            address: '',
+            longitude: widget.deliveryLongitude,
+            latitude: widget.deliveryLatitude,
+          ),
+        ),
+      ),
+    );
+
+    if (pickedLocation == null) {
+      return;
+    }
+
+    await _getDeliveryAddress(
+        pickedLocation.latitude, pickedLocation.longitude);
+    widget.setDeliveryLocation(
+        newDeliveryAddress: _deliveryAddress ?? '',
+        newDeliveryLatitude: pickedLocation.latitude,
+        newDeliveryLongitude: pickedLocation.longitude);
   }
 
   @override
@@ -169,7 +197,7 @@ class _CheckoutDeliveryAddressState extends State<CheckoutDeliveryAddress> {
                           padding: const EdgeInsets.fromLTRB(20, 2, 0, 5),
                           child: Text(
                             _deliveryAddress!,
-                            maxLines: 2,
+                            maxLines: 3,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -177,7 +205,9 @@ class _CheckoutDeliveryAddressState extends State<CheckoutDeliveryAddress> {
                   ),
                 ),
                 IconButton(
-                    onPressed: () {}, icon: const Icon(Icons.navigate_next))
+                  onPressed: _selectOnMap,
+                  icon: const Icon(Icons.navigate_next),
+                )
               ],
             ),
           ),

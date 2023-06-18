@@ -25,4 +25,13 @@ class CustomerUpdateDTO {
       rating: json['rating'],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'customerId': customerId,
+        'firstName': firstName,
+        'lastName': lastName,
+        'middleName': middleName,
+        'address': address,
+        'rating': rating,
+      };
 }

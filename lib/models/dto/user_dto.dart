@@ -12,4 +12,12 @@ class UserDTO {
   final String role;
   final String phoneNumber;
   final String email;
+
+  factory UserDTO.fromJson(Map<String, dynamic> json) => UserDTO(
+        id: json['id'],
+        username: json['username'],
+        role: json['role'],
+        phoneNumber: json['phoneNumber'],
+        email: json['email'],
+      );
 }

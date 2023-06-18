@@ -1,7 +1,7 @@
 class OrderDTO {
   final int id;
   final int merchantId;
-  final int shipperId;
+  final int? shipperId;
   final int customerId;
   final int? promotionId;
   final DateTime placedTime;
@@ -14,42 +14,53 @@ class OrderDTO {
   final String status;
   final String? cancelledBy;
   final String? cancellationReason;
+  final String deliveryAddress;
+  final double deliveryLongitude;
+  final double deliveryLatitude;
 
-  const OrderDTO(
-      {required this.id,
-      required this.merchantId,
-      required this.shipperId,
-      required this.customerId,
-      required this.promotionId,
-      required this.placedTime,
-      required this.eta,
-      required this.deliveryCompletionTime,
-      required this.orderPrice,
-      required this.shippingFee,
-      required this.appFee,
-      required this.promotionDiscount,
-      required this.status,
-      this.cancelledBy = '',
-      this.cancellationReason = ''});
+  const OrderDTO({
+    required this.id,
+    required this.merchantId,
+    this.shipperId,
+    required this.customerId,
+    this.promotionId,
+    required this.placedTime,
+    required this.eta,
+    required this.deliveryCompletionTime,
+    required this.orderPrice,
+    required this.shippingFee,
+    required this.appFee,
+    required this.promotionDiscount,
+    required this.status,
+    this.cancelledBy = '',
+    this.cancellationReason = '',
+    required this.deliveryAddress,
+    required this.deliveryLongitude,
+    required this.deliveryLatitude,
+  });
 
   factory OrderDTO.fromJson(Map<String, dynamic> json) {
     return OrderDTO(
-        id: json['id'],
-        merchantId: json['merchantId'],
-        shipperId: json['shipperId'],
-        customerId: json['customerId'],
-        promotionId: json['promotionId'],
-        placedTime: DateTime.parse(json['placedTime']),
-        eta: DateTime.parse(json['eta']),
-        deliveryCompletionTime: json['deliveryCompletionTime'] == null
-            ? null
-            : DateTime.parse(json['deliveryCompletionTime']),
-        orderPrice: json['orderPrice'].toDouble(),
-        shippingFee: json['shippingFee'].toDouble(),
-        appFee: json['appFee'].toDouble(),
-        promotionDiscount: json['promotionDiscount'].toDouble(),
-        status: json['status'],
-        cancelledBy: json['cancelledBy'],
-        cancellationReason: json['cancellationReason']);
+      id: json['id'],
+      merchantId: json['merchantId'],
+      shipperId: json['shipperId'],
+      customerId: json['customerId'],
+      promotionId: json['promotionId'],
+      placedTime: DateTime.parse(json['placedTime']),
+      eta: DateTime.parse(json['eta']),
+      deliveryCompletionTime: json['deliveryCompletionTime'] != null
+          ? DateTime.parse(json['deliveryCompletionTime'])
+          : null,
+      orderPrice: json['orderPrice'],
+      shippingFee: json['shippingFee'],
+      appFee: json['appFee'],
+      promotionDiscount: json['promotionDiscount'],
+      status: json['status'],
+      cancelledBy: json['cancelledBy'],
+      cancellationReason: json['cancellationReason'],
+      deliveryAddress: json['deliveryAddress'],
+      deliveryLongitude: json['deliveryLongitude'],
+      deliveryLatitude: json['deliveryLatitude'],
+    );
   }
 }

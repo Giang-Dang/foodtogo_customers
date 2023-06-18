@@ -13,6 +13,8 @@ import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/widgets/favorite_widget.dart';
 import 'package:foodtogo_customers/widgets/home_widget.dart';
+import 'package:foodtogo_customers/widgets/me_widget.dart';
+import 'package:foodtogo_customers/widgets/order_widget.dart';
 
 enum TabName { home, orders, favorites, me }
 
@@ -79,7 +81,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
           _isAppBarShow = false;
           _isFloatingButtonShow = true;
         } else if (_selectedPageIndex == TabName.orders.index) {
-          _activePage = const Text('Orders screen');
+          _activePage = const OrderWidget();
           _isAppBarShow = true;
           _isFloatingButtonShow = false;
         } else if (_selectedPageIndex == TabName.favorites.index) {
@@ -90,7 +92,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
           _isAppBarShow = false;
           _isFloatingButtonShow = true;
         } else if (_selectedPageIndex == TabName.me.index) {
-          _activePage = const Text('Me screen');
+          _activePage = const Me();
           _isAppBarShow = false;
           _isFloatingButtonShow = false;
         } else {

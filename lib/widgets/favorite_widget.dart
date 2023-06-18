@@ -106,7 +106,7 @@ class _FavoriteWidgetState extends ConsumerState<FavoriteWidget>
       _merchantList = ref.watch(favoriteMerchantListProvider);
     }
     return Container(
-      padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
+      padding: const EdgeInsets.fromLTRB(0, 45, 0, 0),
       color: KColors.kBackgroundColor,
       child: Column(
         children: [

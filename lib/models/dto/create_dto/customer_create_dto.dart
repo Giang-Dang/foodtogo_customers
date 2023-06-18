@@ -22,4 +22,12 @@ class CustomerCreateDTO {
       address: json['address'],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'customerId': customerId,
+        'firstName': firstName,
+        'lastName': lastName,
+        'middleName': middleName,
+        'address': address,
+      };
 }
