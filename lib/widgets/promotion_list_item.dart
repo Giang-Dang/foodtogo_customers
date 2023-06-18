@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:foodtogo_customers/models/promotion.dart';
+import 'package:foodtogo_customers/screens/merchant_screen.dart';
 import 'package:foodtogo_customers/services/delivery_services.dart';
 import 'package:foodtogo_customers/services/merchant_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
@@ -62,7 +63,13 @@ class _PromotionListItemState extends State<PromotionListItem> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                if (context.mounted) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => MerchantScreen(merchant: merchant),
+                  ));
+                }
+              },
               child: Container(
                 width: cardWidth,
                 height: cardHeight,
