@@ -255,7 +255,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
               ),
               label: 'Orders',
               activeIcon: Icon(
-                Icons.receipt_long_outlined,
+                Icons.receipt_long,
                 color: KColors.kPrimaryColor,
               ),
               backgroundColor: KColors.kOnBackgroundColor,

@@ -45,12 +45,11 @@ class FavoriteMenuItemServices {
         'userId': UserServices.userId,
         'menuItemId': menuItemId,
       });
+      return true;
     } catch (e) {
       log('addFavoriteMenuItem $e');
       return false;
     }
-
-    return true;
   }
 
   Future<bool> removeFavoriteMenuItem(int menuItemId) async {
@@ -62,13 +61,12 @@ class FavoriteMenuItemServices {
         where: 'userId = ? AND menuItemId = ?',
         whereArgs: [UserServices.userId, menuItemId],
       );
-
       log('removeFavoriteMenuItem affects $rowCount row(s).');
+      return true;
     } catch (e) {
       log('removeFavoriteMenuItem $e');
       return false;
     }
-    return true;
   }
 
   Future<bool> containsMenuItemId(int menuItemId) async {

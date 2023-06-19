@@ -29,6 +29,28 @@ class _MapScreenState extends State<MapScreen> {
   GoogleMapController? mapController;
   late bool _isSearching;
 
+  final String _mapStyle = '''
+  [
+    {
+      "featureType": "poi",
+      "elementType": "labels",
+      "stylers": [
+        {
+          "visibility": "off"
+        }
+      ]
+    },
+    {
+      "featureType": "transit.station.bus",
+      "stylers": [
+        {
+          "visibility": "off"
+        }
+      ]
+    }
+  ]
+  ''';
+
   _showAlertDialog(String title, String message) {
     showDialog(
       context: context,
@@ -140,6 +162,7 @@ class _MapScreenState extends State<MapScreen> {
               onMapCreated: (controller) {
                 if (mounted) {
                   setState(() {
+                    controller.setMapStyle(_mapStyle);
                     mapController = controller;
                   });
                 }
@@ -172,6 +195,7 @@ class _MapScreenState extends State<MapScreen> {
                             ),
                       ),
                     },
+              buildingsEnabled: false,
             ),
           ),
         ],
