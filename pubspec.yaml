@@ -78,6 +78,9 @@ flutter:
   assets:
     - assets/images/pizza_loading.gif
     - assets/images/getting_location.gif
+    - assets/images/shipper.png
+    - assets/images/merchant.png
+    - assets/images/user.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
