@@ -29,7 +29,7 @@ class _CheckoutPromotionListState extends State<CheckoutPromotionList> {
   _updatePromotionList(Merchant merchant) async {
     final promotionServices = PromotionServices();
 
-    final promotionList = await promotionServices.getAll(
+    var promotionList = await promotionServices.getAll(
           searchMerchantId: merchant.merchantId,
           checkingDate: DateTime.now(),
         ) ??
@@ -38,6 +38,8 @@ class _CheckoutPromotionListState extends State<CheckoutPromotionList> {
     if (promotionList.isEmpty) {
       return;
     }
+
+    promotionList = promotionList.where((p) => p.quantityLeft > 0).toList();
 
     if (mounted) {
       setState(() {

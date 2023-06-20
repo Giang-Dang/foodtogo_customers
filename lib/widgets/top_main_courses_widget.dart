@@ -45,7 +45,7 @@ class _TopMainCoursesWidgetState extends State<TopMainCoursesWidget> {
       minRating: 4,
       searchItemTypeId: menuItemTypeDTO.id,
       pageNumber: 1,
-      pageSize: 10,
+      pageSize: 100,
     );
 
     if (menuItemList == null) {

@@ -43,7 +43,7 @@ class _TopDrinksWidgetState extends State<TopDrinksWidget> {
       minRating: 4,
       searchItemTypeId: menuItemTypeDTO.id,
       pageNumber: 1,
-      pageSize: 10,
+      pageSize: 100,
     );
 
     if (menuItemList == null) {

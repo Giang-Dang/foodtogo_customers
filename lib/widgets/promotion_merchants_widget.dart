@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/models/merchant.dart';
@@ -31,8 +32,14 @@ class _PromotionMerchantsWidgetState extends State<PromotionMerchantsWidget> {
 
     final promotionServices = PromotionServices();
 
-    final promotionList =
+    var promotionList =
         await promotionServices.getAll(checkingDate: DateTime.now());
+
+    if (promotionList == null) {
+      log('_getPromotionMerchantList promotionList == null');
+      return;
+    }
+    promotionList = promotionList.where((p) => p.quantityLeft > 0).toList();
 
     if (mounted) {
       setState(() {

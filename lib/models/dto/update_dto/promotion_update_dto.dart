@@ -37,4 +37,16 @@ class PromotionUpdateDTO {
       quantityLeft: json['quantityLeft'],
     );
   }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'discountCreatorMerchantId': discountCreatorMerchantId,
+        'name': name,
+        'description': description,
+        'discountPercentage': discountPercentage,
+        'discountAmount': discountAmount,
+        'startDate': startDate.toIso8601String(),
+        'endDate': endDate.toIso8601String(),
+        'quantity': quantity,
+        'quantityLeft': quantityLeft,
+      };
 }

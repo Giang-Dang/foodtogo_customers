@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/models/merchant.dart';
+import 'package:foodtogo_customers/services/location_services.dart';
 import 'package:foodtogo_customers/services/merchant_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
@@ -34,6 +35,23 @@ class _NearbyMerchantsWidgetState extends State<NearbyMerchantsWidget> {
         startLatitude: UserServices.currentLatitude,
         startLongitude: UserServices.currentLongitude,
         searchDistanceInKm: nearbyDistance);
+
+    final locationServices = LocationServices();
+
+    nearbyMerchantList.sort((a, b) {
+      return ((locationServices.calculateDistance(
+                      UserServices.currentLatitude,
+                      UserServices.currentLongitude,
+                      a.geoLatitude,
+                      a.geoLongitude) -
+                  locationServices.calculateDistance(
+                      UserServices.currentLatitude,
+                      UserServices.currentLongitude,
+                      b.geoLatitude,
+                      b.geoLongitude)) *
+              100)
+          .round();
+    });
 
     if (mounted) {
       setState(() {

@@ -170,12 +170,14 @@ class _MenuItemListItemState extends ConsumerState<MenuItemListItem> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          menuItem.name,
-                          style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: KColors.kPrimaryColor),
+                        Expanded(
+                          child: Text(
+                            menuItem.name,
+                            style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: KColors.kPrimaryColor),
+                          ),
                         ),
                         IconButton(
                           onPressed: () {

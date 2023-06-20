@@ -3,12 +3,15 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/models/dto/create_dto/order_create_dto.dart';
 import 'package:foodtogo_customers/models/dto/create_dto/order_details_create_dto.dart';
+import 'package:foodtogo_customers/models/dto/update_dto/promotion_update_dto.dart';
 import 'package:foodtogo_customers/models/merchant.dart';
+import 'package:foodtogo_customers/models/promotion.dart';
 import 'package:foodtogo_customers/services/cart_services.dart';
 import 'package:foodtogo_customers/services/delivery_services.dart';
 import 'package:foodtogo_customers/services/menu_item_services.dart';
 import 'package:foodtogo_customers/services/order_detail_services.dart';
 import 'package:foodtogo_customers/services/order_services.dart';
+import 'package:foodtogo_customers/services/promotion_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/widgets/checkout_delivery_address.dart';
@@ -87,7 +90,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  _showAlertDialog(String title, String message) {
+  _showAlertDialog(String title, String message, Function() onPressed) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -102,11 +105,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
           actions: [
             TextButton(
+              onPressed: onPressed,
               child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
             ),
           ],
         );
@@ -129,6 +129,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     isSuccess &= await _removeOrderedItemInCart(menuItemQuantities);
 
+    if (_selectedPromotionId != 0) {
+      isSuccess &= await _updatePromotionQuantity(_selectedPromotionId);
+    }
+
     if (mounted) {
       setState(() {
         _isPlacingOrder = false;
@@ -137,11 +141,46 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     if (createdOrderId == 0 && !isSuccess) {
       _showAlertDialog('Fail to place your order',
-          'We are experiencing problems with placing your order. Please try again later.');
+          'We are experiencing problems with placing your order. Please try again later.',
+          () {
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      });
     } else {
       _showAlertDialog('Thank you for choosing us!',
-          'Your order has been placed and is being processed.');
+          'Your order has been placed and is being processed.', () {
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      });
     }
+  }
+
+  Future<bool> _updatePromotionQuantity(int selectedPromotionId) async {
+    final promotionServices = PromotionServices();
+
+    final promotion = await promotionServices.get(selectedPromotionId);
+
+    if (promotion == null) {
+      log('_updatePromotionQuantity promotion == null');
+      return false;
+    }
+
+    final updateDTO = PromotionUpdateDTO(
+      id: promotion.id,
+      discountCreatorMerchantId: promotion.discountCreatorMerchant.merchantId,
+      name: promotion.name,
+      discountPercentage: promotion.discountPercentage,
+      discountAmount: promotion.discountAmount,
+      startDate: promotion.startDate,
+      endDate: promotion.endDate,
+      quantity: promotion.quantity,
+      quantityLeft: promotion.quantityLeft - 1,
+    );
+
+    final isSuccess = await promotionServices.update(promotion.id, updateDTO);
+
+    return isSuccess;
   }
 
   Future<Map<int, int>> _getMenuItemQuantities(int merchantId) async {

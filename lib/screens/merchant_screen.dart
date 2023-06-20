@@ -37,6 +37,7 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
   late Function(GlobalKey) runAddToCartAnimation;
   var _cartQuantityItems = 0;
 
+  bool _isMerchantClosed = false;
   bool _isFavorite = false;
   bool _isInitializing = true;
 
@@ -137,6 +138,7 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
 
   _initial(int merchantId) {
     _getMenuItemList(merchantId);
+    _getIsMerchantClosed(widget.merchant);
   }
 
   _onFloatingActionButtonPressed() {
@@ -145,6 +147,18 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
           builder: (context) => CheckoutScreen(
                 merchant: widget.merchant,
               )));
+    }
+  }
+
+  _getIsMerchantClosed(Merchant merchant) async {
+    final merchantServices = MerchantServices();
+    final query = await merchantServices.getAllDTOs(
+        openHoursCheckTime: DateTime.now(), searchName: merchant.name);
+
+    if (mounted) {
+      setState(() {
+        _isMerchantClosed = query.isEmpty;
+      });
     }
   }
 
@@ -211,24 +225,26 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
         this.runAddToCartAnimation = runAddToCartAnimation;
       },
       child: Scaffold(
-        floatingActionButton: SizedBox(
-          width: 50,
-          height: 50,
-          child: FloatingActionButton(
-            onPressed: _onFloatingActionButtonPressed,
-            elevation: 10.0,
-            shape: const CircleBorder(),
-            child: AddToCartIcon(
-              key: cartKey,
-              badgeOptions: const BadgeOptions(
-                active: true,
-                backgroundColor: KColors.kPrimaryColor,
-                foregroundColor: KColors.kBackgroundColor,
+        floatingActionButton: _isMerchantClosed
+            ? null
+            : SizedBox(
+                width: 50,
+                height: 50,
+                child: FloatingActionButton(
+                  onPressed: _onFloatingActionButtonPressed,
+                  elevation: 10.0,
+                  shape: const CircleBorder(),
+                  child: AddToCartIcon(
+                    key: cartKey,
+                    badgeOptions: const BadgeOptions(
+                      active: true,
+                      backgroundColor: KColors.kPrimaryColor,
+                      foregroundColor: KColors.kBackgroundColor,
+                    ),
+                    icon: const Icon(Icons.shopping_cart_outlined),
+                  ),
+                ),
               ),
-              icon: const Icon(Icons.shopping_cart_outlined),
-            ),
-          ),
-        ),
         body: Stack(
           children: [
             Container(
@@ -256,7 +272,7 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
                     ),
                     Container(
                       width: deviceWidth,
-                      height: 100,
+                      height: 125,
                       color: KColors.kOnBackgroundColor,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -280,6 +296,14 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
+                                if (_isMerchantClosed)
+                                  const Text(
+                                    '[Closed]',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: KColors.kTextColor,
+                                    ),
+                                  ),
                                 const SizedBox(height: 10),
                                 IntrinsicHeight(
                                   child: Row(
