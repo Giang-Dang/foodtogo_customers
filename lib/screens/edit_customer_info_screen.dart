@@ -174,7 +174,7 @@ class _EditCustomerInfoScreenState extends State<EditCustomerInfoScreen> {
       if (!isSuccess) {
         _showAlertDialog(
           'Sorry',
-          'Unable to update your merchant at the moment. Please try again at a later time.',
+          'Unable to update your account at the moment. Please try again at a later time.',
           () {
             Navigator.of(context).pop();
           },
@@ -187,7 +187,7 @@ class _EditCustomerInfoScreenState extends State<EditCustomerInfoScreen> {
 
       _showAlertDialog(
         'Success',
-        'We have successfully updated your merchant.',
+        'We have successfully updated your account.',
         () {
           Navigator.pop(context);
           Navigator.pop(context, popObjects);

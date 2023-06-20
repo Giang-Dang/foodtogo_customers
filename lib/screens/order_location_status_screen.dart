@@ -152,6 +152,7 @@ class _OrderLocationStatusScreenState extends State<OrderLocationStatusScreen> {
               position: _shipperLocation!,
               infoWindow: const InfoWindow(title: 'Shipper'),
               icon: _shipperIcon ?? BitmapDescriptor.defaultMarker,
+              zIndex: 1.0,
             ),
           Marker(
             markerId: const MarkerId('customer'),
