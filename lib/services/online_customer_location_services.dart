@@ -9,7 +9,6 @@ import 'package:foodtogo_customers/models/online_customer_location.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/secrets.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart' as path;
 
 class OnlineCustomerLocationServices {
   static const _apiUrl = 'api/OnlineCustomerLocationAPI';

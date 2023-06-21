@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/models/menu_item.dart';

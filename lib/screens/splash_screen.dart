@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/models/dto/create_dto/online_customer_location_create_dto.dart';
 import 'package:foodtogo_customers/models/dto/update_dto/online_customer_location_update_dto.dart';
-import 'package:foodtogo_customers/models/online_customer_location.dart';
 import 'package:foodtogo_customers/screens/customer_register_screen.dart';
 import 'package:foodtogo_customers/screens/login_screen.dart';
 import 'package:foodtogo_customers/screens/tabs_screen.dart';

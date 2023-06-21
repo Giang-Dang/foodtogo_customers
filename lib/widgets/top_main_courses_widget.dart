@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:foodtogo_customers/models/dto/menu_item_type_dto.dart';
 import 'package:foodtogo_customers/models/menu_item.dart';
 import 'package:foodtogo_customers/services/menu_item_services.dart';
 import 'package:foodtogo_customers/services/menu_item_type_services.dart';
-import 'package:foodtogo_customers/services/promotion_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/widgets/menu_item_card_list.dart';
 
@@ -19,8 +18,9 @@ class TopMainCoursesWidget extends StatefulWidget {
 
 class _TopMainCoursesWidgetState extends State<TopMainCoursesWidget> {
   List<MenuItem> _menuItemList = [];
-  bool _isLoading = true;
+  final int _maxNumberOfItems = 10;
 
+  bool _isLoading = true;
   Timer? _initTimer;
 
   _getMenuItemList() async {
@@ -59,10 +59,13 @@ class _TopMainCoursesWidgetState extends State<TopMainCoursesWidget> {
       },
     );
 
+    menuItemList = menuItemList.sublist(
+        0, math.min(menuItemList.length, _maxNumberOfItems));
+
     if (mounted) {
       setState(() {
         _isLoading = false;
-        _menuItemList = menuItemList;
+        _menuItemList = menuItemList ?? [];
       });
     }
   }
@@ -88,6 +91,10 @@ class _TopMainCoursesWidgetState extends State<TopMainCoursesWidget> {
       ),
     );
     if (!_isLoading) {
+      if (_menuItemList.isEmpty) {
+        return Container();
+      }
+
       menuItemListContent = Row(
         children: [
           MenuItemCardList(menuItemList: _menuItemList),

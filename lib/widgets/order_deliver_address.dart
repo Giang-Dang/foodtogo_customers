@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:foodtogo_customers/models/enum/user_type.dart';
 import 'package:foodtogo_customers/models/order.dart';
-import 'package:foodtogo_customers/screens/rating_user_screen.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
-import 'package:foodtogo_customers/widgets/rating_button.dart';
 
 class OrderDeliverAddress extends StatelessWidget {
   const OrderDeliverAddress({

@@ -72,59 +72,85 @@ class _CheckoutPromotionListState extends State<CheckoutPromotionList> {
 
   @override
   Widget build(BuildContext context) {
-    return _promotionList.isEmpty
-        ? const Divider()
-        : Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 3,
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+    Widget returnContent = Container(
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      decoration: BoxDecoration(
+        color: KColors.kOnBackgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 3,
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: const Center(
+          child: Text(
+        'Sorry, we don’t have any promotions available at the moment. Please check back soon for updates!',
+        softWrap: true,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 14,
+        ),
+      )),
+    );
+
+    if (_promotionList.isNotEmpty) {
+      returnContent = Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 3,
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-            child: Column(children: [
-              Container(
-                color: KColors.kOnBackgroundColor,
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(8, 10, 0, 0),
-                child: Text(
-                  'Promotions:',
+          ],
+        ),
+        child: Column(children: [
+          Container(
+            color: KColors.kOnBackgroundColor,
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(8, 10, 0, 0),
+            child: Text(
+              'Promotions:',
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: KColors.kTextColor,
+                    fontSize: 18,
+                  ),
+            ),
+          ),
+          for (var promotion in _promotionList)
+            Container(
+              color: KColors.kOnBackgroundColor,
+              child: RadioListTile(
+                title: Text(
+                  promotion.name,
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: KColors.kTextColor,
-                        fontSize: 18,
+                        fontSize: 16,
                       ),
                 ),
+                value: promotion.id,
+                groupValue: _selectedPromotionId,
+                onChanged: (value) {
+                  if (value != null) {
+                    widget.getSelectedPromotionId(value);
+                  }
+                  if (mounted) {
+                    setState(() {
+                      _selectedPromotionId = value;
+                    });
+                  }
+                },
               ),
-              for (var promotion in _promotionList)
-                Container(
-                  color: KColors.kOnBackgroundColor,
-                  child: RadioListTile(
-                    title: Text(
-                      promotion.name,
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color: KColors.kTextColor,
-                            fontSize: 16,
-                          ),
-                    ),
-                    value: promotion.id,
-                    groupValue: _selectedPromotionId,
-                    onChanged: (value) {
-                      if (value != null) {
-                        widget.getSelectedPromotionId(value);
-                      }
-                      if (mounted) {
-                        setState(() {
-                          _selectedPromotionId = value;
-                        });
-                      }
-                    },
-                  ),
-                )
-            ]),
-          );
+            )
+        ]),
+      );
+    }
+
+    return returnContent;
   }
 }

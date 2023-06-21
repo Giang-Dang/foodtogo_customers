@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/models/customer.dart';
-import 'package:foodtogo_customers/models/dto/user_dto.dart';
 import 'package:foodtogo_customers/models/place_location.dart';
 import 'package:foodtogo_customers/screens/map_screen.dart';
 import 'package:foodtogo_customers/services/customer_services.dart';

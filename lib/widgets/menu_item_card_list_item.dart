@@ -100,7 +100,7 @@ class _MenuItemCardListItemState extends ConsumerState<MenuItemCardListItem> {
     final menuItem = widget.menuItem;
 
     final double containerHeight = maxHeight - 30;
-    final double containerWidth = 140;
+    const double containerWidth = 140;
 
     final jwtToken = UserServices.jwtToken;
 

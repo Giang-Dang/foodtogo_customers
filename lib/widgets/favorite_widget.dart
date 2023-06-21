@@ -9,7 +9,7 @@ import 'package:foodtogo_customers/providers/favorite_merchant_list_provider.dar
 import 'package:foodtogo_customers/services/favorite_menu_item_services.dart';
 import 'package:foodtogo_customers/services/favorite_merchant_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
-import 'package:foodtogo_customers/widgets/menu_item_list.dart';
+import 'package:foodtogo_customers/widgets/favorite_menu_item_tabbar.dart';
 import 'package:foodtogo_customers/widgets/merchant_list.dart';
 
 class FavoriteWidget extends ConsumerStatefulWidget {
@@ -137,7 +137,7 @@ class _FavoriteWidgetState extends ConsumerState<FavoriteWidget>
               controller: _tabController,
               children: [
                 MerchantList(merchantList: _merchantList),
-                MenuItemList(
+                FavoriteMenuItemTabbar(
                   menuItemList: _menuItemList,
                   addToCart: widget.addToCart,
                   removeFromCart: widget.removeFromCart,

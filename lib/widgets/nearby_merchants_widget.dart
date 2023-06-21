@@ -82,6 +82,10 @@ class _NearbyMerchantsWidgetState extends State<NearbyMerchantsWidget> {
       ),
     );
     if (!_isLoading) {
+      if (_nearbyMerchantList.isEmpty) {
+        return Container();
+      }
+
       merchantListcontain = Row(
         children: [
           MerchantCardList(merchantList: _nearbyMerchantList),

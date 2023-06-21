@@ -77,9 +77,14 @@ class _MerchantInfoOpenHoursState extends State<MerchantInfoOpenHours> {
       if (current != null) {
         trailingContent = Text(
           '${timeFormatter.format(current.openTime)} - ${timeFormatter.format(current.closeTime)}',
-          style: TextStyle(color: KColors.kSuccessColor),
+          style: const TextStyle(color: KColors.kSuccessColor),
         );
       }
+
+      final now = DateTime.now();
+      final todayDayOfWeek = DateFormat('EEEE').format(now);
+      final isToday = todayDayOfWeek.toLowerCase() ==
+          DaysOfWeek.values[i].name.toLowerCase();
 
       columnChilren.add(Container(
         padding: const EdgeInsets.fromLTRB(20, 2, 40, 2),
@@ -87,7 +92,14 @@ class _MerchantInfoOpenHoursState extends State<MerchantInfoOpenHours> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Text(DaysOfWeek.values[i].name),
+            Text(
+              isToday
+                  ? '${DaysOfWeek.values[i].name} (today)'
+                  : DaysOfWeek.values[i].name,
+              style: TextStyle(
+                fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
             trailingContent,
           ],
         ),

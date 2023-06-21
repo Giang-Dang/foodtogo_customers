@@ -3,11 +3,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:foodtogo_customers/models/merchant.dart';
-import 'package:foodtogo_customers/models/normal_open_hours.dart';
 import 'package:foodtogo_customers/services/delivery_services.dart';
 import 'package:foodtogo_customers/services/location_services.dart';
 import 'package:foodtogo_customers/services/merchant_services.dart';
-import 'package:foodtogo_customers/services/normal_open_hours_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/widgets/merchant_info_open_hours.dart';
@@ -147,7 +145,7 @@ class MerchantInfoScreen extends StatelessWidget {
               ),
 
               //Map location Image & address
-              Container(
+              SizedBox(
                 width: deviceWidth,
                 height: deviceWidth / 2,
                 child: Stack(
@@ -159,7 +157,7 @@ class MerchantInfoScreen extends StatelessWidget {
                           merchant.geoLongitude,
                         );
                       },
-                      child: Container(
+                      child: SizedBox(
                         width: deviceWidth,
                         height: deviceWidth / 2,
                         child: FadeInImage(

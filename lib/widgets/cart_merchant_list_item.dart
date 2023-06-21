@@ -7,7 +7,6 @@ import 'package:foodtogo_customers/services/merchant_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/settings/secrets.dart';
-import 'package:foodtogo_customers/widgets/checkout_menu_item_list.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class CartMerchantListItem extends StatefulWidget {

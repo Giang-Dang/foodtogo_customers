@@ -6,7 +6,6 @@ import 'package:foodtogo_customers/models/enum/user_type.dart';
 import 'package:foodtogo_customers/models/order.dart';
 import 'package:foodtogo_customers/services/order_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
-import 'package:foodtogo_customers/widgets/checkout_menu_item_list.dart';
 import 'package:foodtogo_customers/widgets/order_deliver_address.dart';
 import 'package:foodtogo_customers/widgets/order_menu_item_list.dart';
 import 'package:foodtogo_customers/widgets/order_merchant.dart';

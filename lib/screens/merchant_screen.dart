@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodtogo_customers/models/menu_item.dart';
 import 'package:foodtogo_customers/models/merchant.dart';
 import 'package:foodtogo_customers/providers/favorite_merchant_list_provider.dart';
-import 'package:foodtogo_customers/screens/cart_screen.dart';
 import 'package:foodtogo_customers/screens/checkout_screen.dart';
 import 'package:foodtogo_customers/screens/merchant_info_screen.dart';
 import 'package:foodtogo_customers/services/cart_services.dart';

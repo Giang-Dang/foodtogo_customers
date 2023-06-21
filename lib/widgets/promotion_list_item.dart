@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:foodtogo_customers/models/promotion.dart';
 import 'package:foodtogo_customers/screens/merchant_screen.dart';
 import 'package:foodtogo_customers/services/delivery_services.dart';

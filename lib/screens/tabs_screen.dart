@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:add_to_cart_animation/add_to_cart_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -203,7 +202,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
                     top: 16,
                     right: 3,
                     child: Container(
-                      padding: EdgeInsets.all(2),
+                      padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
                         color: KColors.kPrimaryColor,
                         borderRadius: BorderRadius.circular(10),

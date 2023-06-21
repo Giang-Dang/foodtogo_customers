@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/models/merchant.dart';
 import 'package:foodtogo_customers/services/cart_services.dart';
-import 'package:foodtogo_customers/settings/kTheme.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/widgets/cart_merchant_list.dart';
 

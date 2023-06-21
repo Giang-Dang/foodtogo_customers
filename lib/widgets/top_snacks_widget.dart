@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/models/menu_item.dart';
@@ -17,8 +18,9 @@ class TopSnacksWidget extends StatefulWidget {
 
 class _TopSnacksWidgetState extends State<TopSnacksWidget> {
   List<MenuItem> _menuItemList = [];
-  bool _isLoading = true;
+  final int _maxNumberOfItems = 10;
 
+  bool _isLoading = true;
   Timer? _initTimer;
 
   _getMenuItemList() async {
@@ -57,10 +59,13 @@ class _TopSnacksWidgetState extends State<TopSnacksWidget> {
       },
     );
 
+    menuItemList = menuItemList.sublist(
+        0, math.min(menuItemList.length, _maxNumberOfItems));
+
     if (mounted) {
       setState(() {
         _isLoading = false;
-        _menuItemList = menuItemList;
+        _menuItemList = menuItemList ?? [];
       });
     }
   }
@@ -86,6 +91,10 @@ class _TopSnacksWidgetState extends State<TopSnacksWidget> {
       ),
     );
     if (!_isLoading) {
+      if (_menuItemList.isEmpty) {
+        return Container();
+      }
+      
       menuItemListContent = Row(
         children: [
           MenuItemCardList(menuItemList: _menuItemList),

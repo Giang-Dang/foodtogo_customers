@@ -2,7 +2,6 @@ import 'package:flutter/services.dart';
 import 'package:foodtogo_customers/models/place_location.dart';
 import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/services/location_services.dart';
-import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 

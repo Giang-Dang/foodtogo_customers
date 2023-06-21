@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:foodtogo_customers/models/dto/create_dto/customer_create_dto.dart';
 import 'package:foodtogo_customers/models/place_location.dart';
-import 'package:foodtogo_customers/screens/login_screen.dart';
 import 'package:foodtogo_customers/screens/map_screen.dart';
 import 'package:foodtogo_customers/screens/tabs_screen.dart';
 import 'package:foodtogo_customers/services/customer_services.dart';

@@ -52,7 +52,7 @@ class OrderPriceWidget extends StatelessWidget {
           Container(
             color: KColors.kOnBackgroundColor,
             child: ListTile(
-              title: Text('Subtotal: '),
+              title: const Text('Subtotal: '),
               trailing: Text(
                 '\$${order.orderPrice.toStringAsFixed(1)}',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(

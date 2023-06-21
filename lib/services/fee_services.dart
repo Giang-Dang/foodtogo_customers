@@ -1,6 +1,6 @@
 class FeeServices {
-  static double _appFeePercentage = 10.0;
-  static double _shippingFeePerKm = 5;
+  static const double _appFeePercentage = 10.0;
+  static const double _shippingFeePerKm = 5;
 
   double calAppFee(double subTotal) {
     return subTotal / 100 * _appFeePercentage;

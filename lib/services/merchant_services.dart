@@ -9,7 +9,6 @@ import 'package:foodtogo_customers/services/location_services.dart';
 import 'package:foodtogo_customers/services/merchant_rating_services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
-import 'dart:math' as math;
 
 import 'package:foodtogo_customers/models/dto/create_dto/mechant_profile_image_create_dto.dart';
 import 'package:foodtogo_customers/models/dto/create_dto/merchant_create_dto.dart';

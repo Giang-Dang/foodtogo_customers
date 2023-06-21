@@ -9,11 +9,13 @@ class MenuItemList extends StatefulWidget {
     required this.menuItemList,
     this.addToCart,
     this.removeFromCart,
+    this.onTap,
   }) : super(key: key);
 
+  final List<MenuItem> menuItemList;
   final Function(GlobalKey widgetKey, MenuItem menuItem)? addToCart;
   final Function(MenuItem menuItem)? removeFromCart;
-  final List<MenuItem> menuItemList;
+  final Function(MenuItem menuItem)? onTap;
 
   @override
   State<MenuItemList> createState() => _MenuItemListState();
@@ -27,11 +29,13 @@ class _MenuItemListState extends State<MenuItemList> {
     return Container(
       color: KColors.kBackgroundColor,
       child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
         itemCount: menuItemList.length,
         itemBuilder: (context, index) => MenuItemListItem(
           menuItem: menuItemList[index],
           addToCart: widget.addToCart,
           removeFromCart: widget.removeFromCart,
+          onTap: widget.onTap,
         ),
       ),
     );

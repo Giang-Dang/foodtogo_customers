@@ -185,7 +185,7 @@ class _SearchScreenState extends State<SearchScreen>
                   ),
                   labelColor: Colors.white,
                   unselectedLabelColor: Colors.black,
-                  tabs: [
+                  tabs: const [
                     Tab(text: 'Merchant'),
                     Tab(text: 'Dishes'),
                   ]),

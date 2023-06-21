@@ -6,7 +6,6 @@ import 'package:foodtogo_customers/models/dto/create_dto/order_create_dto.dart';
 import 'package:foodtogo_customers/models/dto/create_dto/order_details_create_dto.dart';
 import 'package:foodtogo_customers/models/dto/update_dto/promotion_update_dto.dart';
 import 'package:foodtogo_customers/models/merchant.dart';
-import 'package:foodtogo_customers/models/promotion.dart';
 import 'package:foodtogo_customers/services/cart_services.dart';
 import 'package:foodtogo_customers/services/delivery_services.dart';
 import 'package:foodtogo_customers/services/menu_item_services.dart';

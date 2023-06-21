@@ -12,7 +12,6 @@ import 'package:foodtogo_customers/services/customer_services.dart';
 import 'package:foodtogo_customers/services/location_services.dart';
 import 'package:foodtogo_customers/services/user_services.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
-import 'package:foodtogo_customers/widgets/checkout_delivery_address.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class EditCustomerInfoScreen extends StatefulWidget {
@@ -150,9 +149,14 @@ class _EditCustomerInfoScreenState extends State<EditCustomerInfoScreen> {
 
   _onSavePressed() async {
     if (_formEditCustomerInfoKey.currentState!.validate()) {
+      if (mounted) {
+        setState(() {
+          _isEditing = true;
+        });
+      }
       final userServices = UserServices();
       final userUpdateDTO = UserUpdateDTO(
-        id: _userDTO!.id,
+        id: _userDTO.id,
         phoneNumber: _phoneNumberController.text,
         email: _emailController.text,
       );
@@ -170,6 +174,12 @@ class _EditCustomerInfoScreenState extends State<EditCustomerInfoScreen> {
       var isSuccess = await userServices.update(_userDTO.id, userUpdateDTO);
       isSuccess &= await customerServices.update(
           _customer.customerId, customerUpdateDTO);
+
+      if (mounted) {
+        setState(() {
+          _isEditing = false;
+        });
+      }
 
       if (!isSuccess) {
         _showAlertDialog(
@@ -402,7 +412,7 @@ class _EditCustomerInfoScreenState extends State<EditCustomerInfoScreen> {
                         const SizedBox(width: 15),
                         Flexible(flex: 4, child: Text(_address)),
                         IconButton(
-                          icon: Icon(Icons.navigate_next),
+                          icon: const Icon(Icons.navigate_next),
                           onPressed: _selectOnMap,
                         ),
                       ],

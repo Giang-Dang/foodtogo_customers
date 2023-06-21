@@ -23,6 +23,7 @@ class _MerchantListState extends State<MerchantList> {
     return Container(
       color: KColors.kBackgroundColor,
       child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
         itemCount: merchantList.length,
         itemBuilder: (context, index) => MerchantListItem(
           merchant: merchantList[index],
