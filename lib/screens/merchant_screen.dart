@@ -9,6 +9,7 @@ import 'package:foodtogo_customers/models/merchant.dart';
 import 'package:foodtogo_customers/providers/favorite_merchant_list_provider.dart';
 import 'package:foodtogo_customers/screens/cart_screen.dart';
 import 'package:foodtogo_customers/screens/checkout_screen.dart';
+import 'package:foodtogo_customers/screens/merchant_info_screen.dart';
 import 'package:foodtogo_customers/services/cart_services.dart';
 import 'package:foodtogo_customers/services/delivery_services.dart';
 import 'package:foodtogo_customers/services/favorite_merchant_services.dart';
@@ -37,13 +38,44 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
   late Function(GlobalKey) runAddToCartAnimation;
   var _cartQuantityItems = 0;
 
-  bool _isMerchantClosed = false;
+  bool _isMerchantClosed = true;
   bool _isFavorite = false;
   bool _isInitializing = true;
 
   Timer? _initTimer;
 
   List<MenuItem> _menuItemList = [];
+
+  removeFromCart(MenuItem menuItem) async {
+    final cartServices = CartServices();
+    int quantity = await cartServices.getQuantity(menuItem.id);
+    if (quantity == 0) {
+      return;
+    }
+    bool isRemovingSuccess =
+        await cartServices.addMenuItem(menuItem, quantity - 1);
+
+    if (isRemovingSuccess) {
+      await cartKey.currentState!
+          .updateBadge((--_cartQuantityItems).toString());
+    }
+  }
+
+  addToCart(GlobalKey widgetKey, MenuItem menuItem) async {
+    final cartServices = CartServices();
+    int quantity = await cartServices.getQuantity(menuItem.id);
+    bool isAddingSuccess =
+        await cartServices.addMenuItem(menuItem, quantity + 1);
+
+    if (isAddingSuccess) {
+      //animation
+
+      await runAddToCartAnimation(widgetKey);
+
+      await cartKey.currentState!
+          .runCartAnimation((++_cartQuantityItems).toString());
+    }
+  }
 
   _getFavoriteStatus(int merchantId) async {
     final favoriteMerchantServices = FavoriteMerchantServices();
@@ -98,35 +130,6 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
     }
   }
 
-  removeFromCart(MenuItem menuItem) async {
-    final cartServices = CartServices();
-    int quantity = await cartServices.getQuantity(menuItem.id);
-    if (quantity == 0) {
-      return;
-    }
-    bool isRemovingSuccess =
-        await cartServices.addMenuItem(menuItem, quantity - 1);
-
-    if (isRemovingSuccess) {
-      await cartKey.currentState!
-          .updateBadge((--_cartQuantityItems).toString());
-    }
-  }
-
-  addToCart(GlobalKey widgetKey, MenuItem menuItem) async {
-    final cartServices = CartServices();
-    int quantity = await cartServices.getQuantity(menuItem.id);
-    bool isAddingSuccess =
-        await cartServices.addMenuItem(menuItem, quantity + 1);
-
-    if (isAddingSuccess) {
-      //animation
-      await runAddToCartAnimation(widgetKey);
-      await cartKey.currentState!
-          .runCartAnimation((++_cartQuantityItems).toString());
-    }
-  }
-
   _setCartQuantity(int merchantId) async {
     final cartServices = CartServices();
     int totalQuantity =
@@ -136,9 +139,13 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
     }
   }
 
-  _initial(int merchantId) {
-    _getMenuItemList(merchantId);
-    _getIsMerchantClosed(widget.merchant);
+  _onInfoButtonTap() {
+    if (context.mounted) {
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => MerchantInfoScreen(
+                merchant: widget.merchant,
+              )));
+    }
   }
 
   _onFloatingActionButtonPressed() {
@@ -160,6 +167,11 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
         _isMerchantClosed = query.isEmpty;
       });
     }
+  }
+
+  _initial(int merchantId) {
+    _getMenuItemList(merchantId);
+    _getIsMerchantClosed(widget.merchant);
   }
 
   @override
@@ -225,26 +237,24 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
         this.runAddToCartAnimation = runAddToCartAnimation;
       },
       child: Scaffold(
-        floatingActionButton: _isMerchantClosed
-            ? null
-            : SizedBox(
-                width: 50,
-                height: 50,
-                child: FloatingActionButton(
-                  onPressed: _onFloatingActionButtonPressed,
-                  elevation: 10.0,
-                  shape: const CircleBorder(),
-                  child: AddToCartIcon(
-                    key: cartKey,
-                    badgeOptions: const BadgeOptions(
-                      active: true,
-                      backgroundColor: KColors.kPrimaryColor,
-                      foregroundColor: KColors.kBackgroundColor,
-                    ),
-                    icon: const Icon(Icons.shopping_cart_outlined),
-                  ),
-                ),
+        floatingActionButton: SizedBox(
+          width: 50,
+          height: 50,
+          child: FloatingActionButton(
+            onPressed: _onFloatingActionButtonPressed,
+            elevation: 10.0,
+            shape: const CircleBorder(),
+            child: AddToCartIcon(
+              key: cartKey,
+              badgeOptions: const BadgeOptions(
+                active: true,
+                backgroundColor: KColors.kPrimaryColor,
+                foregroundColor: KColors.kBackgroundColor,
               ),
+              icon: const Icon(Icons.shopping_cart_outlined),
+            ),
+          ),
+        ),
         body: Stack(
           children: [
             Container(
@@ -301,7 +311,8 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
                                     '[Closed]',
                                     style: TextStyle(
                                       fontSize: 16,
-                                      color: KColors.kTextColor,
+                                      color: KColors.kDanger,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 const SizedBox(height: 10),
@@ -311,6 +322,7 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       RatingBarIndicator(
+                                        rating: merchant.rating,
                                         itemBuilder: (context, index) =>
                                             const Icon(
                                           Icons.star,
@@ -347,7 +359,7 @@ class _MerchantWidgetState extends ConsumerState<MerchantScreen> {
                           Column(
                             children: [
                               IconButton(
-                                onPressed: () {},
+                                onPressed: _onInfoButtonTap,
                                 icon: const Icon(Icons.info_outline,
                                     color: KColors.kLightTextColor),
                               ),

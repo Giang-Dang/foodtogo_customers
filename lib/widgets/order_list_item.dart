@@ -13,14 +13,19 @@ class OrderListItem extends StatelessWidget {
   const OrderListItem({
     Key? key,
     required this.order,
+    this.onPop,
   }) : super(key: key);
 
   final Order order;
+  final Function()? onPop;
 
   _onTapListTile(BuildContext context, Order order) {
     if (context.mounted) {
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => OrderDetailsScreen(order: order),
+        builder: (context) => OrderDetailsScreen(
+          order: order,
+          onPop: onPop,
+        ),
       ));
     }
   }
@@ -28,6 +33,8 @@ class OrderListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final OrderServices orderServices = OrderServices();
+
+    
 
     Widget contain = const ListTile(
       leading: CircularProgressIndicator(),
@@ -37,7 +44,7 @@ class OrderListItem extends StatelessWidget {
     contain = Container(
       margin: const EdgeInsets.symmetric(
         horizontal: 10,
-        vertical: 8,
+        vertical: 10,
       ),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),

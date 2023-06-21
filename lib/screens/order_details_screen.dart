@@ -21,9 +21,11 @@ class OrderDetailsScreen extends ConsumerStatefulWidget {
   const OrderDetailsScreen({
     Key? key,
     required this.order,
+    this.onPop,
   }) : super(key: key);
 
   final Order order;
+  final Function()? onPop;
 
   @override
   ConsumerState<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
@@ -139,7 +141,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
       appFee: order.appFee,
       promotionDiscount: order.promotionDiscount,
       status: OrderStatus.Cancelled.name.toLowerCase(),
-      cancelledBy: UserType.Merchant.name.toLowerCase(),
+      cancelledBy: UserType.Customer.name.toLowerCase(),
       cancellationReason: reason,
       deliveryAddress: order.deliveryAddress,
       deliveryLatitude: order.deliveryLatitude,
@@ -155,8 +157,13 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     isSuccess &= (orderList != null);
 
     if (isSuccess) {
+      if(widget.onPop != null) {
+        widget.onPop!();
+      }
+      
       _showAlertDialog('Cancelled', 'The order has been cancelled', () {
         if (context.mounted) {
+          Navigator.of(context).pop();
           Navigator.of(context).pop();
           Navigator.of(context).pop();
         }

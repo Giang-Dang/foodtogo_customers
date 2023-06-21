@@ -13,7 +13,7 @@ import 'package:foodtogo_customers/widgets/menu_item_list.dart';
 import 'package:foodtogo_customers/widgets/merchant_list.dart';
 
 class FavoriteWidget extends ConsumerStatefulWidget {
-  FavoriteWidget({Key? key, this.addToCart, this.removeFromCart})
+  const FavoriteWidget({Key? key, this.addToCart, this.removeFromCart})
       : super(key: key);
 
   final Function(GlobalKey widgetKey, MenuItem menuItem)? addToCart;

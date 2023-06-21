@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:foodtogo_customers/models/promotion.dart';
 import 'package:foodtogo_customers/services/cart_services.dart';
 import 'package:foodtogo_customers/services/delivery_services.dart';
 import 'package:foodtogo_customers/services/menu_item_services.dart';
+import 'package:foodtogo_customers/services/merchant_services.dart';
 import 'package:foodtogo_customers/services/order_detail_services.dart';
 import 'package:foodtogo_customers/services/order_services.dart';
 import 'package:foodtogo_customers/services/promotion_services.dart';
@@ -42,7 +44,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   double _deliveryLongitude = UserServices.currentLongitude;
   double _deliveryLatitude = UserServices.currentLatitude;
 
+  bool? _isMerchantClosed;
+
   bool _isPlacingOrder = false;
+
+  Timer? _initTimer;
 
   setSelectedPromotionId(int value) {
     setState(() {
@@ -88,6 +94,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       hours,
       mins,
     );
+  }
+
+  _getIsMerchantClosed(Merchant merchant) async {
+    final merchantServices = MerchantServices();
+    final query = await merchantServices.getAllDTOs(
+        openHoursCheckTime: DateTime.now(), searchName: merchant.name);
+
+    if (mounted) {
+      setState(() {
+        _isMerchantClosed = query.isEmpty;
+      });
+    }
   }
 
   _showAlertDialog(String title, String message, Function() onPressed) {
@@ -281,9 +299,59 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _initTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      _getIsMerchantClosed(widget.merchant);
+      _initTimer?.cancel();
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _initTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double deviceHeight = MediaQuery.of(context).size.height;
     final merchant = widget.merchant;
+
+    Widget placeOrderWidget = ElevatedButton(
+        onPressed: () {}, child: const CircularProgressIndicator.adaptive());
+
+    if (_isMerchantClosed != null) {
+      if (_isMerchantClosed!) {
+        placeOrderWidget = const Center(
+            child: Text(
+          'Merchant has been closed. Please order later.',
+          style: TextStyle(
+            color: KColors.kDanger,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ));
+      } else {
+        placeOrderWidget = ElevatedButton(
+          onPressed: _onPlaceOrderPressed,
+          style: ElevatedButton.styleFrom(
+              backgroundColor: KColors.kPrimaryColor, elevation: 4),
+          child: _isPlacingOrder
+              ? const CircularProgressIndicator.adaptive(
+                  backgroundColor: KColors.kOnBackgroundColor,
+                )
+              : const Text(
+                  'Place Order',
+                  style: TextStyle(
+                      color: KColors.kOnBackgroundColor, fontSize: 18),
+                ),
+        );
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -326,20 +394,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ElevatedButton(
-                onPressed: _onPlaceOrderPressed,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: KColors.kPrimaryColor, elevation: 4),
-                child: _isPlacingOrder
-                    ? const CircularProgressIndicator.adaptive(
-                        backgroundColor: KColors.kOnBackgroundColor,
-                      )
-                    : const Text(
-                        'Place Order',
-                        style: TextStyle(
-                            color: KColors.kOnBackgroundColor, fontSize: 18),
-                      ),
-              ),
+              child: placeOrderWidget,
             ),
             const SizedBox(height: 40),
           ]),

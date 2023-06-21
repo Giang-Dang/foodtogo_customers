@@ -20,9 +20,9 @@ class _OrderWidgetState extends State<OrderWidget> {
     List<Order> orderList = [];
 
     List<Future> futures = [];
-    OrderStatus.values.forEach((element) {
+    for (var element in OrderStatus.values) {
       if (element != OrderStatus.Completed &&
-          element != OrderStatus.Completed) {
+          element != OrderStatus.Cancelled) {
         futures.add(() async {
           orderList = [
             ...await orderServices.getAll(
@@ -33,10 +33,14 @@ class _OrderWidgetState extends State<OrderWidget> {
           ];
         }());
       }
-    });
+    }
     await Future.wait(futures);
 
     return orderList;
+  }
+
+  refresh() {
+    setState(() {});
   }
 
   @override
@@ -47,6 +51,8 @@ class _OrderWidgetState extends State<OrderWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final deviceHeight = MediaQuery.sizeOf(context).height;
+
     return FutureBuilder(
       future: _getUserOrders(),
       builder: (context, snapshot) {
@@ -56,11 +62,16 @@ class _OrderWidgetState extends State<OrderWidget> {
           );
         } else {
           return Container(
+            height: deviceHeight,
             color: KColors.kBackgroundColor,
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  for (var order in snapshot.data!) OrderListItem(order: order),
+                  for (var order in snapshot.data!)
+                    OrderListItem(
+                      order: order,
+                      onPop: refresh,
+                    ),
                 ],
               ),
             ),
