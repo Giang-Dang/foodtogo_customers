@@ -61,8 +61,6 @@ class _RatingMerchantScreenState extends State<RatingMerchantScreen> {
       fromUserType: UserType.Customer.name,
       toMerchantId: order.merchant.merchantId,
       orderId: order.id,
-      pageNumber: 1,
-      pageSize: 1,
     );
 
     if (queryResult == null) {
@@ -126,8 +124,6 @@ class _RatingMerchantScreenState extends State<RatingMerchantScreen> {
       fromUserType: UserType.Customer.name,
       toMerchantId: order.merchant.merchantId,
       orderId: order.id,
-      pageNumber: 1,
-      pageSize: 1,
     );
 
     if (queryResult == null) {

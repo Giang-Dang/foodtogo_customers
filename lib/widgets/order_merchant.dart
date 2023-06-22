@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:foodtogo_customers/models/enum/user_type.dart';
 import 'package:foodtogo_customers/models/order.dart';
+import 'package:foodtogo_customers/screens/merchant_info_screen.dart';
 import 'package:foodtogo_customers/screens/rating_merchant_screen.dart';
 import 'package:foodtogo_customers/settings/kcolors.dart';
 import 'package:foodtogo_customers/widgets/rating_button.dart';
@@ -33,13 +34,33 @@ class OrderMerchant extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Merchant',
-          textAlign: TextAlign.start,
-          style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: KColors.kLightTextColor,
-                fontSize: 22,
+        Row(
+          children: [
+            Text(
+              'Merchant',
+              textAlign: TextAlign.start,
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    color: KColors.kLightTextColor,
+                    fontSize: 22,
+                  ),
+            ),
+            IconButton(
+              onPressed: () {
+                if (context.mounted) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          MerchantInfoScreen(merchant: order.merchant),
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(
+                Icons.info_outlined,
+                color: KColors.kPrimaryColor,
               ),
+            ),
+          ],
         ),
         const SizedBox(height: 10),
         Container(

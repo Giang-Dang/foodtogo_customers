@@ -82,44 +82,42 @@ class _SearchMenuItemListState extends State<SearchMenuItemList>
     );
 
     if (!_isLoading) {
-      content = Expanded(
-        child: Column(
-          children: [
-            Container(
-              height: 30,
-              margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-              child: TabBar(
-                  isScrollable: true,
-                  controller: _tabController,
-                  indicator: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25.0),
-                    color: KColors.kPrimaryColor,
-                  ),
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.black,
-                  tabs: [
-                    const Tab(text: '     All     '),
-                    for (var type in _menuItemTypeList)
-                      Tab(text: '     ${type.name}     '),
-                  ]),
+      content = Column(
+        children: [
+          Container(
+            height: 30,
+            margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(25.0),
             ),
-            Expanded(
-              child: TabBarView(
+            child: TabBar(
+                isScrollable: true,
                 controller: _tabController,
-                children: [
-                  MenuItemList(menuItemList: menuItemList),
+                indicator: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25.0),
+                  color: KColors.kPrimaryColor,
+                ),
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.black,
+                tabs: [
+                  const Tab(text: '     All     '),
                   for (var type in _menuItemTypeList)
-                    MenuItemList(menuItemList: _filter(menuItemList, type)),
-                ],
-              ),
+                    Tab(text: '     ${type.name}     '),
+                ]),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                MenuItemList(menuItemList: menuItemList),
+                for (var type in _menuItemTypeList)
+                  MenuItemList(menuItemList: _filter(menuItemList, type)),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       );
     }
 
