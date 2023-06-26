@@ -24,13 +24,11 @@ class _OrderWidgetState extends State<OrderWidget> {
       if (element != OrderStatus.Completed &&
           element != OrderStatus.Cancelled) {
         futures.add(() async {
-          orderList = [
-            ...await orderServices.getAll(
-                  customerId: UserServices.userId,
-                  searchStatus: element.name,
-                ) ??
-                []
-          ];
+          orderList.addAll(await orderServices.getAll(
+                customerId: UserServices.userId,
+                searchStatus: element.name,
+              ) ??
+              []);
         }());
       }
     }
