@@ -1,16 +1,28 @@
 # foodtogo_customers
 
-A new Flutter project.
+This is a customer-focused Flutter application. 
+This program is a component of the FoodToGo system.
 
-## Getting Started
+## Main functions:
+- Login/Logout (automatically login using a JWT token saved from the previous login if not logged out).
+- Find food/restaurants. 
+- Add/remove foods from your favorites list.
+- Add/remove food from cart.
+- Create/cancel/track orders (including shipper delivery location).
+- Modify your account information.
+- Rate merchants and shippers.
 
-This project is a starting point for a Flutter application.
+## System Architecture
 
-A few resources to get you started if this is your first Flutter project:
+![Architecture_customers.jpg](/screenshots/Architecture_customers.jpg)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Screenshots
+![Screenshot_customer_01.jpg](/Screenshots/Screenshot_customer_01.jpg)
+![Screenshot_customer_02.jpg](/Screenshots/Screenshot_customer_02.jpg)
+![Screenshot_customer_03.jpg](/Screenshots/Screenshot_customer_03.jpg)
+![Screenshot_customer_04.jpg](/Screenshots/Screenshot_customer_04.jpg)
+![Screenshot_customer_05.jpg](/Screenshots/Screenshot_customer_05.jpg)
+![Screenshot_customer_06.jpg](/Screenshots/Screenshot_customer_06.jpg)
+![Screenshot_customer_07.jpg](/Screenshots/Screenshot_customer_07.jpg)
+![Screenshot_customer_08.jpg](/Screenshots/Screenshot_customer_08.jpg)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
