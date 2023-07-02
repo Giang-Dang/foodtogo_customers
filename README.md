@@ -17,12 +17,12 @@ This program is a component of the FoodToGo system.
 ![Architecture_customers.jpg](/screenshots/Architecture_customers.jpg)
 
 ## Screenshots
-![Screenshot_customer_01.jpg](/Screenshots/Screenshot_customer_01.jpg)
-![Screenshot_customer_02.jpg](/Screenshots/Screenshot_customer_02.jpg)
-![Screenshot_customer_03.jpg](/Screenshots/Screenshot_customer_03.jpg)
-![Screenshot_customer_04.jpg](/Screenshots/Screenshot_customer_04.jpg)
-![Screenshot_customer_05.jpg](/Screenshots/Screenshot_customer_05.jpg)
-![Screenshot_customer_06.jpg](/Screenshots/Screenshot_customer_06.jpg)
-![Screenshot_customer_07.jpg](/Screenshots/Screenshot_customer_07.jpg)
-![Screenshot_customer_08.jpg](/Screenshots/Screenshot_customer_08.jpg)
+![Screenshot_customer_01.jpg](/screenshots/Screenshot_customer_01.jpg)
+![Screenshot_customer_02.jpg](/screenshots/Screenshot_customer_02.jpg)
+![Screenshot_customer_03.jpg](/screenshots/Screenshot_customer_03.jpg)
+![Screenshot_customer_04.jpg](/screenshots/Screenshot_customer_04.jpg)
+![Screenshot_customer_05.jpg](/screenshots/Screenshot_customer_05.jpg)
+![Screenshot_customer_06.jpg](/screenshots/Screenshot_customer_06.jpg)
+![Screenshot_customer_07.jpg](/screenshots/Screenshot_customer_07.jpg)
+![Screenshot_customer_08.jpg](/screenshots/Screenshot_customer_08.jpg)
 
